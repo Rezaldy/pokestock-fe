@@ -16,6 +16,6 @@ export default boot(({ Vue }) => {
   });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   Vue.prototype.$axios = axios.create({
-    baseURL: 'https://pokestock.local/api'
+    baseURL: process.env.API,
   });
 });
