@@ -55,10 +55,10 @@ module.exports = configure(function (ctx) {
       env: {
         API: ctx.dev
           ? 'https://pokestock.local/api'
-          : 'https://api.shop.onceinluv.com/api',
+          : 'https://api.onceinluv.com/api',
         API_PLAIN: ctx.dev
           ? 'https://pokestock.local'
-          : 'https://api.shop.onceinluv.com',
+          : 'https://api.onceinluv.com',
       },
       // transpile: false,
 
