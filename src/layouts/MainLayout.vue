@@ -184,8 +184,7 @@ export default class MainLayout extends Vue {
   connectDiscord() {
     let win: null | Window;
     let checkConnect: number;
-    const API: string = process.env.API ?? '';
-    const oAuthURL = API + '/login/discord';
+    const oAuthURL = process.env.API_PLAIN + '/login/discord';
 
     win = window.open(oAuthURL, 'SomeAuthentication', 'width=972,height=660,modal=yes,alwaysRaised=yes');
 

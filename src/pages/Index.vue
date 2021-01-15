@@ -16,8 +16,7 @@ export default class PageIndex extends Vue {
   twitchLogin() {
     let win: null | Window;
     let checkConnect: number;
-    const API: string = process.env.API ?? '';
-    const oAuthURL = API + '/login';
+    const oAuthURL = process.env.API_PLAIN + '/login';
 
     win = window.open(oAuthURL, 'SomeAuthentication', 'width=972,height=660,modal=yes,alwaysRaised=yes');
 
