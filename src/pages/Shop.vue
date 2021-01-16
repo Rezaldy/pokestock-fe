@@ -88,8 +88,7 @@
                 <q-item-section>
                   <q-item-label class="row q-gutter-xs">
                     <q-btn class="text-center" :key="listing.id" v-for="listing in props.row.product_listings" :color="listing.isDiscount ? 'positive' : 'secondary'">
-<!--                      {{ listing.amount }}x${{ (listing.price/listing.amount).toFixed(2) }}-->
-                      {{listing.isDiscount}}
+                      {{ listing.amount }}x${{ (listing.price/listing.amount).toFixed(2) }}
                       <q-tooltip>
                         Total ${{listing.price.toFixed(2)}}
                       </q-tooltip>
