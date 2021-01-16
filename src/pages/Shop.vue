@@ -6,11 +6,11 @@
       :grid="isGrid"
       :loading="loading"
       :rows-per-page-options="rowsPerPageOptions"
-      ref="products"
+      ref="items"
       :class="{'bg-accent': !$q.dark.isActive, 'bg-dark': $q.dark.isActive, 'shadow-8': navigationActive, 'no-outline': navigationActive}"
       class="full-width"
       tabindex="0"
-      title="Products"
+      title="Shop"
       :data="data"
       color="primary"
       :columns="columns"
@@ -20,7 +20,6 @@
       @focusin.native="activateNavigation"
       @focusout.native="deactivateNavigation"
       @keydown.native="onKey"
-      @row-click="onRowClick"
     >
       <template v-slot:loading>
         <q-inner-loading showing color="primary"/>
@@ -30,9 +29,9 @@
           class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
           :style="props.selected ? 'transform: scale(0.95);' : ''"
         >
-          <q-card :class="props.selected ? 'bg-grey-2' : ''">
+          <q-card class="q-pb-sm" :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section>
-              <q-img :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
+              <q-img contain class="productImage" :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
             </q-card-section>
             <q-separator/>
             <q-list dense>
@@ -72,6 +71,26 @@
                   </q-item-label>
                 </q-item-section>
               </q-item>
+              <q-item>
+                <q-item-section>
+                  <q-item-label>{{
+                      props.cols.filter(function (col) {
+                        return col.name === 'price';
+                      })[0].label
+                    }}
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="row q-gutter-xs">
+                    <q-btn class="text-center" :key="listing.id" v-for="listing in props.row.product_listings" color="secondary">
+                      {{ listing.amount }} × {{ (listing.price/listing.amount).toFixed(2) }}
+                      <q-tooltip>
+                        Total ${{listing.price.toFixed(2)}}
+                      </q-tooltip>
+                    </q-btn>
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
             </q-list>
           </q-card>
         </div>
@@ -94,6 +113,18 @@
         <q-td :props="props">
           <div>
             <img width="50" :src="props.value">
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-price="props">
+        <q-td :props="props">
+          <div class="row q-gutter-sm">
+            <q-btn class="text-center" :key="listing.id"  v-for="listing in props.row.product_listings" color="secondary">
+              {{ listing.amount }} × {{ (listing.price/listing.amount).toFixed(2) }}
+              <q-tooltip>
+                Total ${{listing.price.toFixed(2)}}
+              </q-tooltip>
+            </q-btn>
           </div>
         </q-td>
       </template>
@@ -139,8 +170,8 @@ export default class Shop extends Vue {
   columns = [
     {name: 'image', label: 'Image', field: 'image', align: 'left'},
     {name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left'},
-    {name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left'},
     {name: 'type', label: 'Type', field: 'type', align: 'left'},
+    {name: 'price', label: 'Price', field: 'price_listings', sortable: true, align: 'left'},
     {name: 'amount_in_stock', label: 'Amount in stock', field: 'amount_in_stock', sortable: true, align: 'left'},
   ];
 
@@ -179,7 +210,7 @@ export default class Shop extends Vue {
   onKey(evt: { keyCode: number; preventDefault: () => void; }) {
     if (
       !this.navigationActive || [33, 34, 35, 36, 38, 40].indexOf(evt.keyCode) === -1 ||
-      this.$refs.products === void 0
+      this.$refs.items === void 0
     ) {
       return
     }
@@ -187,7 +218,7 @@ export default class Shop extends Vue {
     evt.preventDefault()
 
     // eslint-disable-next-line
-    const tableRef: any = this.$refs.products;
+    const tableRef: any = this.$refs.items;
     // eslint-disable-next-line
     const {computedRowsNumber, computedRows} = tableRef
 
@@ -251,7 +282,7 @@ export default class Shop extends Vue {
 
       this.$nextTick(() => {
         // eslint-disable-next-line
-        const {computedRows}: any = this.$refs.products;
+        const {computedRows}: any = this.$refs.items;
         this.selected = [computedRows[Math.min(index, computedRows.length - 1)]]
       })
     } else {
@@ -275,4 +306,7 @@ export default class Shop extends Vue {
 </script>
 
 <style lang="scss">
+.productImage {
+  height:250px
+}
 </style>

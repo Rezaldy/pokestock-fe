@@ -205,8 +205,8 @@ export default class Products extends Vue {
   columns = [
     {name: 'image', label: 'Image', field: 'image', align: 'left'},
     {name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left'},
-    {name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left'},
     {name: 'type', label: 'Type', field: 'type', align: 'left'},
+    {name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left'},
     {name: 'amount_in_stock', label: 'Amount in stock', field: 'amount_in_stock', sortable: true, align: 'left'},
     // eslint-disable-next-line
     {name: 'hidden', label: 'Is hidden', field: 'hidden', sortable: true, align: 'center'},
