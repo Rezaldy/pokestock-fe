@@ -33,6 +33,11 @@
             <q-card-section>
               <q-img contain class="productImage" :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
             </q-card-section>
+            <q-card-section class="text-center">
+              <h6>
+                {{props.row.name}}
+              </h6>
+            </q-card-section>
             <q-separator/>
             <q-list dense>
               <q-item>
