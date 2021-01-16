@@ -49,6 +49,10 @@
                      :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                      stack-label required dense filled v-model="productFormData.amount_in_stock"
                      label="Amount in stock"/>
+            <q-input class="q-mt-sm" type="number"
+                     :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
+                     stack-label required dense filled v-model="productFormData.hidden_stock"
+                     label="Actual stock (hidden)"/>
             <q-select class="q-mt-sm" filled map-options emit-value
                       :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                       v-model="productFormData.type" :options="typesArray" label="Type"/>
@@ -238,6 +242,7 @@ export default class Products extends Vue {
     {name: 'type', label: 'Type', field: 'type', align: 'left'},
     {name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left'},
     {name: 'amount_in_stock', label: 'Amount in stock', field: 'amount_in_stock', sortable: true, align: 'left'},
+    {name: 'hidden_stock', label: 'Actual stock', field: 'hidden_stock', sortable: true, align: 'left'},
     // eslint-disable-next-line
     {name: 'hidden', label: 'Is hidden', field: 'hidden', sortable: true, align: 'center'},
   ];

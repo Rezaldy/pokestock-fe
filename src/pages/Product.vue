@@ -2,6 +2,11 @@
   <q-page class="column items-top justify-start q-px-xl q-py-md">
     <div class="bg-accent rounded-borders">
       <q-card class="product-card q-pt-lg" flat bordered>
+        <q-btn @click="$router.push({name: 'products'})" round color="primary" icon="arrow_left" class="q-ml-lg">
+          <q-tooltip>
+            Back to products
+          </q-tooltip>
+        </q-btn>
         <q-img contain class="product-image" :src="image"/>
         <q-card-section>
           <q-badge color="secondary text-capitalize">{{ type }}</q-badge>
@@ -9,7 +14,8 @@
           <div class="text-caption text-grey">
             {{ description }}
           </div>
-          <div class="text-h6 q-mt-sm q-mb-xs">Amount in stock: {{ amount_in_stock }}</div>
+          <div class="text-h5 q-mt-sm q-mb-xs">Amount in stock: {{ amount_in_stock }}</div>
+          <div class="text-h6 q-mt-sm q-mb-xs">Actual stock: {{ hidden_stock }}</div>
           <q-btn @click="showProductInfo" color="primary" icon="edit" label="Edit product" class="q-mr-sm"/>
           <q-btn @click="confirmRemoveProduct" color="negative" icon="delete" label="Remove product"  class="q-mr-sm"/>
           <q-dialog v-model="productFormState" persistent transition-show="scale" transition-hide="scale">
@@ -28,6 +34,9 @@
                 <q-input class="q-mt-sm" type="number" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                          stack-label required dense filled v-model="productFormData.amount_in_stock"
                          label="Amount in stock"/>
+                <q-input class="q-mt-sm" type="number" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
+                         stack-label required dense filled v-model="productFormData.hidden_stock"
+                         label="Actual stock"/>
                 <q-select class="q-mt-sm" filled map-options emit-value
                           :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                           v-model="productFormData.type" :options="typesArray" label="Type"/>
@@ -306,6 +315,7 @@ export default class Products extends Vue {
   public productFormData: {
     id?: number;
     amount_in_stock?: number;
+    hidden_stock?: number;
     image?: string;
     name?: string;
     type?: number;
@@ -314,6 +324,7 @@ export default class Products extends Vue {
   } = {
     id: undefined,
     amount_in_stock: undefined,
+    hidden_stock: undefined,
     image: undefined,
     name: undefined,
     type: undefined,
@@ -324,6 +335,7 @@ export default class Products extends Vue {
   public name?: string = '';
   public description?: string = '';
   public amount_in_stock?: number = 0;
+  public hidden_stock?: number = 0;
   public productListingsData = [];
   public listingData: {
     id?: number,
@@ -510,6 +522,7 @@ export default class Products extends Vue {
         this.name = response.data.name;
         this.description = response.data.description;
         this.amount_in_stock = response.data.amount_in_stock;
+        this.hidden_stock = response.data.hidden_stock;
       }
     ).catch(
       error => {
