@@ -15,7 +15,7 @@
             {{ description }}
           </div>
           <div class="text-h5 q-mt-sm q-mb-xs">Amount in stock: {{ amount_in_stock }}</div>
-          <div class="text-h6 q-mt-sm q-mb-xs">Actual stock: {{ hidden_stock }}</div>
+          <div class="text-h6 q-mt-sm q-mb-xs">Withheld stock: {{ hidden_stock }}</div>
           <q-btn @click="showProductInfo" color="primary" icon="edit" label="Edit product" class="q-mr-sm"/>
           <q-btn @click="confirmRemoveProduct" color="negative" icon="delete" label="Remove product"  class="q-mr-sm"/>
           <q-dialog v-model="productFormState" persistent transition-show="scale" transition-hide="scale">
@@ -36,7 +36,7 @@
                          label="Amount in stock"/>
                 <q-input class="q-mt-sm" type="number" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                          stack-label required dense filled v-model="productFormData.hidden_stock"
-                         label="Actual stock"/>
+                         label="Withheld stock"/>
                 <q-select class="q-mt-sm" filled map-options emit-value
                           :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                           v-model="productFormData.type" :options="typesArray" label="Type"/>

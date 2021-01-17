@@ -52,7 +52,7 @@
             <q-input class="q-mt-sm" type="number"
                      :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                      stack-label required dense filled v-model="productFormData.hidden_stock"
-                     label="Actual stock (hidden)"/>
+                     label="Withheld stock (hidden)"/>
             <q-select class="q-mt-sm" filled map-options emit-value
                       :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                       v-model="productFormData.type" :options="typesArray" label="Type"/>
@@ -204,6 +204,14 @@
               <q-icon name="search"/>
             </template>
           </q-input>
+          <q-btn
+            class="q-mx-sm"
+            color="primary"
+            icon-right="archive"
+            label="Export to csv"
+            no-caps
+            @click="exportTable"
+          />
           <q-btn @click="openProductForm" round color="primary" icon="control_point"/>
         </template>
         <template v-slot:no-data="{ icon, message, filter }">
@@ -221,7 +229,29 @@
 </template>
 
 <script lang="ts">
+import { exportFile } from 'quasar';
 import {Vue, Component} from 'vue-property-decorator';
+
+
+function wrapCsvValue (val: any, formatFn: any) {
+  let formatted = formatFn !== void 0
+    ? formatFn(val)
+    : val
+
+  formatted = formatted === void 0 || formatted === null
+    ? ''
+    : String(formatted)
+
+  formatted = formatted.split('"').join('""')
+  /**
+   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+   * Uncomment the next two lines to escape new lines
+   */
+  // .split('\n').join('\\n')
+  // .split('\r').join('\\r')
+
+  return `"${formatted}"`
+}
 
 @Component({
   components: {}
@@ -241,7 +271,7 @@ export default class Products extends Vue {
     {name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left'},
     {name: 'type', label: 'Type', field: 'type', align: 'left'},
     {name: 'amount_in_stock', label: 'Amount in stock', field: 'amount_in_stock', sortable: true, align: 'left'},
-    {name: 'hidden_stock', label: 'Actual stock', field: 'hidden_stock', sortable: true, align: 'left'},
+    {name: 'hidden_stock', label: 'Withheld stock', field: 'hidden_stock', sortable: true, align: 'left'},
     // eslint-disable-next-line
     {name: 'hidden', label: 'Is hidden', field: 'hidden', sortable: true, align: 'center'},
   ];
@@ -442,9 +472,9 @@ export default class Products extends Vue {
     );
   }
 
-  confirmShowSelected () {
+  confirmShowSelected() {
     const selectedIds = this.selected.map(
-      (selectedItem: {id: number}) => {
+      (selectedItem: { id: number }) => {
         return selectedItem.id;
       }
     );
@@ -474,9 +504,9 @@ export default class Products extends Vue {
     });
   }
 
-  confirmHideSelected () {
+  confirmHideSelected() {
     const selectedIds = this.selected.map(
-      (selectedItem: {id: number}) => {
+      (selectedItem: { id: number }) => {
         return selectedItem.id;
       }
     );
@@ -506,9 +536,9 @@ export default class Products extends Vue {
     });
   }
 
-  confirmRemoveSelected () {
+  confirmRemoveSelected() {
     const selectedIds = this.selected.map(
-      (selectedItem: {id: number}) => {
+      (selectedItem: { id: number }) => {
         return selectedItem.id;
       }
     );
@@ -536,6 +566,37 @@ export default class Products extends Vue {
     }).onDismiss(() => {
       // console.log('I am triggered on both OK and Cancel')
     });
+  }
+
+  exportTable() {
+    // Filter out image column
+    const filteredColumns = this.columns.filter(column => column.field !== 'image');
+
+    // naive encoding to csv format
+    const content = [filteredColumns.map(col => wrapCsvValue(col.label, void 0))].concat(
+      this.data.map(row => filteredColumns.map(col => wrapCsvValue(
+        typeof col.field === 'function'
+          // @ts-ignore
+          ? col.field(row)
+          : row[col.field === void 0 ? col.name : col.field],
+        // @ts-ignore
+        col.format
+      )).join(','))
+    ).join('\r\n')
+
+    const status = exportFile(
+      'table-export.csv',
+      content,
+      'text/csv'
+    )
+
+    if (status !== true) {
+      this.$q.notify({
+        message: 'Browser denied file download...',
+        color: 'negative',
+        icon: 'warning'
+      })
+    }
   }
 };
 </script>
