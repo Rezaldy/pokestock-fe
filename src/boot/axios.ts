@@ -1,6 +1,5 @@
 import axios, {AxiosInstance, AxiosResponse} from 'axios';
 import { boot } from 'quasar/wrappers';
-import VueRouter from 'vue-router';
 
 declare module 'vue/types/vue' {
   interface Vue {

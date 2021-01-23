@@ -237,6 +237,20 @@
               </q-item>
               <q-item>
                 <q-item-section>
+                  <q-item-label>
+                    Starting at
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-item-label caption>
+                    <q-badge color="secondary">
+                      {{ props.row.product_listings[0].amount }} for ${{ props.row.product_listings[0].price }}
+                    </q-badge>
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section>
                   <q-item-label>{{
                       props.cols.filter(function (col) {
                         return col.name === 'amount_in_stock';
@@ -573,12 +587,7 @@ export default class Shop extends Vue {
   showShoppingCart() {
     this.shoppingCartState = true;
     this.shoppingCartLoadingState = true;
-
-    this.$axios.post('shop/cart').then(
-      response => {
-        this.$store.commit('shop/setCart', response.data);
-      }
-    ).finally(
+    this.$store.dispatch('shop/fetchShoppingCart').finally(
       () => {
         this.shoppingCartLoadingState = false;
       }
@@ -587,11 +596,13 @@ export default class Shop extends Vue {
 
   created() {
     this.loading = true;
-    this.$axios.get('shop').then(
+    const cartPromise = this.$store.dispatch('shop/fetchShoppingCart');
+    const shopPromise = this.$axios.get('shop').then(
       response => {
         this.data = response.data as unknown[];
       }
-    ).finally(
+    )
+    Promise.all([cartPromise, shopPromise]).finally(
       () => {
         this.loading = false;
       }
