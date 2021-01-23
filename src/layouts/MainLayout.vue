@@ -20,9 +20,6 @@
                  :src="$store.getters['auth/user'].avatar"/>
           <q-menu touch-position>
             <q-list>
-              <q-item clickable v-close-popup class="text-center">
-                <q-item-section>Profile</q-item-section>
-              </q-item>
               <q-item clickable class="text-center">
                 <q-item-section @click="toggleDark">{{$q.dark.isActive ? 'Light Mode' : 'Dark Mode'}}</q-item-section>
               </q-item>

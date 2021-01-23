@@ -86,6 +86,7 @@
         :selected.sync="selected"
         :pagination.sync="pagination"
         :filter="filter"
+        :rows-per-page-options="rowsPerPageOptions"
         @focusin.native="activateNavigation"
         @focusout.native="deactivateNavigation"
         @keydown.native="onKey"
@@ -229,11 +230,11 @@
 </template>
 
 <script lang="ts">
-import { exportFile } from 'quasar';
+import {exportFile} from 'quasar';
 import {Vue, Component} from 'vue-property-decorator';
 
 
-function wrapCsvValue (val: any, formatFn: any) {
+function wrapCsvValue(val: any, formatFn: any) {
   let formatted = formatFn !== void 0
     ? formatFn(val)
     : val
@@ -267,6 +268,7 @@ export default class Products extends Vue {
   selected: any = [];
   pagination: any = {};
   columns = [
+    {name: 'id', label: 'ID', field: 'id', align: 'left'},
     {name: 'image', label: 'Image', field: 'image', align: 'left'},
     {name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left'},
     {name: 'type', label: 'Type', field: 'type', align: 'left'},
@@ -304,6 +306,10 @@ export default class Products extends Vue {
     {label: 'Boosterbox', value: 3},
     {label: 'Miscbox', value: 4},
   ];
+
+  get rowsPerPageOptions() {
+    return [12, 24, 48];
+  }
 
   activateNavigation() {
     this.navigationActive = true;

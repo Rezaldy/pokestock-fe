@@ -1,7 +1,179 @@
 <template>
   <q-page class="row items-start justify-start q-pa-xl">
+    <q-toolbar class="bg-primary text-white">
+      <q-toolbar-title>
+        Shop
+      </q-toolbar-title>
+      <q-btn round @click="showShoppingCart" flat color="white" icon="local_grocery_store" class="q-mr-sm">
+        <q-badge color="red" floating>{{ $store.getters['shop/getCartSize'] }}</q-badge>
+      </q-btn>
+      <q-dialog
+        v-model="shoppingCartState" persistent
+      >
+        <q-card style="width: 700px; max-width: 80vw;">
+          <q-card-section>
+            <div class="text-h6">Shopping cart</div>
+          </q-card-section>
 
-    <p class="text-h1 text-white text-center full-width ">Shop</p>
+          <q-card-section class="q-pt-none">
+            <div>
+              <q-list v-if="Object.keys($store.getters['shop/getCart']).length" bordered separator>
+                <q-item v-ripple v-for="cartItem in $store.getters['shop/getCart']" :key="cartItem.order.id">
+                  <q-item-section>
+                    <q-item-section class="col-1" avatar>
+                      <q-avatar color="primary" rounded text-color="white">
+                        <q-img :src="cartItem.product.image"/>
+                      </q-avatar>
+                    </q-item-section>
+                  </q-item-section>
+                  <q-item-section class="col-10">
+                    <q-item-label>{{ cartItem.product.name }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section class="col-1">
+                    <q-item-label class="text-bold">${{ cartItem.order.price }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section class="col-11">
+                    <q-item-label>Total</q-item-label>
+                  </q-item-section>
+                  <q-item-section class="col-1">
+                    <q-item-label class="text-bold">${{ cartTotal }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <div v-else>
+                Your shopping cart is empty.
+              </div>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right" class="bg-white text-teal">
+            <q-btn flat label="Close" v-close-popup/>
+            <q-btn flat label="Submit order" v-close-popup/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+    </q-toolbar>
+    <!-- Orderform start -->
+    <q-dialog
+      v-model="orderFormState"
+      @hide="order.selectedListing = {};order.selectedProduct = {}"
+    >
+      <q-card style="width: 700px; max-width: 80vw;">
+        <q-inner-loading :showing="orderFormLoadingState">
+          <q-spinner-gears size="50px" color="primary"/>
+        </q-inner-loading>
+        <q-card-section>
+          <div class="text-h5">Add item to cart</div>
+        </q-card-section>
+        <q-separator/>
+        <q-item-section class="q-pa-md">
+          <q-slide-transition appear>
+            <q-item-label v-if="!Object.keys(order.selectedListing).length">
+              <div class="text-h6">Select a price listing:</div>
+              <div class="row q-gutter-xs">
+                <q-btn
+                  @click="setSelectedListing(listing)" class="text-center" :key="listing.id"
+                  v-for="listing in order.selectedProduct.product_listings"
+                  :color="listing.isDiscount ? 'positive' : 'secondary'">
+                  {{ listing.amount }}x${{ (listing.price / listing.amount).toFixed(2) }}
+                  <q-tooltip
+                    transition-show="scale"
+                    transition-hide="scale"
+                    anchor="top middle"
+                    self="bottom middle"
+                  >
+                    Total ${{ listing.price.toFixed(2) }}
+                  </q-tooltip>
+                </q-btn>
+              </div>
+            </q-item-label>
+          </q-slide-transition>
+        </q-item-section>
+        <q-separator/>
+        <q-card-section class="q-pt-none">
+          <div>
+            <div class="row">
+              <div class="col">
+                Name
+              </div>
+              <div class="col">
+                <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                      class="text-bold">{{ selectedProduct.name }}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                Stock
+              </div>
+              <div class="col">
+                <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                      class="text-bold">{{ selectedProduct.amount_in_stock }}</span>
+              </div>
+            </div>
+            <!-- Order selected -->
+            <q-slide-transition appear>
+              <div v-if="Object.keys(order.selectedListing).length !== 0">
+                <q-separator/>
+                <div class="row">
+                  <div class="col">
+                    Price of selected order
+                  </div>
+                  <div class="col">
+                    <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                          class="text-bold">${{ selectedListing.price }}</span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    Amount in selected order
+                  </div>
+                  <div class="col">
+                    <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                          class="text-bold">{{ selectedListing.amount }}</span>
+                  </div>
+                </div>
+                <q-separator class="q-mb-md"/>
+                <div class="row">
+                  <div class="col">
+                    <q-input label="Quantity" type="number" :min="1"
+                             @input="validateQuantity"
+                             :max="selectedProduct.amount_in_stock / selectedListing.amount" filled
+                             v-model.number="order.quantity"/>
+                  </div>
+                </div>
+                <q-separator class="q-mb-md"/>
+                <div class="row">
+                  <div class="col">
+                    Subtotal
+                    <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                          class="text-bold">{{
+                        order.quantity
+                      }}</span> * <span
+                    :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                    class="text-bold">{{ selectedListing.price }}</span>
+                  </div>
+                  <div class="col">
+                    <span :class="{'text-positive': this.$q.dark.isActive, 'text-primary': !this.$q.dark.isActive}"
+                          class="text-bold">${{ (order.quantity * selectedListing.price).toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </q-slide-transition>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right" class="bg-white text-teal">
+          <q-btn flat v-if="Object.keys(order.selectedListing).length" @click="order.selectedListing = {}"
+                 label="Reset"/>
+          <q-btn flat label="Cancel" v-close-popup/>
+          <q-btn flat :disabled="!Object.keys(order.selectedListing).length" @click="addToCart" label="Add to cart"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <!-- Orderform End -->
+    <!-- Table Start -->
     <q-table
       :grid="isGrid"
       :loading="loading"
@@ -10,7 +182,6 @@
       :class="{'bg-accent': !$q.dark.isActive, 'bg-dark': $q.dark.isActive, 'shadow-8': navigationActive, 'no-outline': navigationActive}"
       class="full-width"
       tabindex="0"
-      title="Shop"
       :data="data"
       color="primary"
       :columns="columns"
@@ -31,11 +202,12 @@
         >
           <q-card class="q-pb-sm" :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section>
-              <q-img contain class="productImage" :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
+              <q-img contain class="productImage"
+                     :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
             </q-card-section>
             <q-card-section class="text-center">
               <h6>
-                {{props.row.name}}
+                {{ props.row.name }}
               </h6>
             </q-card-section>
             <q-separator/>
@@ -76,27 +248,18 @@
                   </q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item>
-                <q-item-section>
-                  <q-item-label>{{
-                      props.cols.filter(function (col) {
-                        return col.name === 'price';
-                      })[0].label
-                    }}
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="row q-gutter-xs">
-                    <q-btn class="text-center" :key="listing.id" v-for="listing in props.row.product_listings" :color="listing.isDiscount ? 'positive' : 'secondary'">
-                      {{ listing.amount }}x${{ (listing.price/listing.amount).toFixed(2) }}
-                      <q-tooltip>
-                        Total ${{listing.price.toFixed(2)}}
-                      </q-tooltip>
-                    </q-btn>
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
             </q-list>
+            <q-separator/>
+            <div v-if="getBiggestDiscount(props.row.product_listings)" class="text-center q-py-md">
+              Get a pack of <span class="text-positive text-bold">{{
+                getBiggestDiscount(props.row.product_listings).amount
+              }}</span> at a discounted price of <span
+              class="text-positive text-bold">${{ getBiggestDiscount(props.row.product_listings).price }}</span>!
+            </div>
+            <q-separator v-if="getBiggestDiscount(props.row.product_listings)"/>
+            <q-card-actions align="around">
+              <q-btn @click="openOrderForm(props.row)" flat style="width:100%">Add to cart</q-btn>
+            </q-card-actions>
           </q-card>
         </div>
       </template>
@@ -124,10 +287,15 @@
       <template v-slot:body-cell-price="props">
         <q-td :props="props">
           <div class="row q-gutter-sm">
-            <q-btn class="text-center" :key="listing.id"  v-for="listing in props.row.product_listings" color="secondary">
-              {{ listing.amount }} × {{ (listing.price/listing.amount).toFixed(2) }}
-              <q-tooltip>
-                Total ${{listing.price.toFixed(2)}}
+            <q-btn class="text-center" :key="listing.id" v-for="listing in props.row.product_listings"
+                   color="secondary">
+              {{ listing.amount }} × {{ (listing.price / listing.amount).toFixed(2) }}
+              <q-tooltip
+                transition-show="scale"
+                transition-hide="scale"
+                anchor="top middle"
+                self="bottom middle">
+                Total ${{ listing.price.toFixed(2) }}
               </q-tooltip>
             </q-btn>
           </div>
@@ -151,20 +319,43 @@
         </div>
       </template>
     </q-table>
+    <!-- Table end -->
   </q-page>
 </template>
 
 <script lang="ts">
-import {Vue, Component} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
+import {Validations} from 'vuelidate-property-decorators';
+import {required} from 'vuelidate/lib/validators';
 
 @Component({
   components: {}
 })
 export default class Shop extends Vue {
+  @Validations()
+  validations = {
+    order: {
+      quantity: {required}
+    }
+  }
+
+
   public isGrid = true;
   public data: unknown[] = [];
   public loading = false;
   public navigationActive = false;
+  public orderFormLoadingState = false;
+  public orderFormState = false;
+  public shoppingCartState = false;
+  public order: {
+    selectedProduct?: any;
+    selectedListing?: any;
+    quantity?: number;
+  } = {
+    selectedProduct: {},
+    selectedListing: {},
+    quantity: 1,
+  };
 
   filter = '';
   // eslint-disable-next-line
@@ -188,8 +379,15 @@ export default class Shop extends Vue {
     'Misc box': 4,
   };
 
-  protected onRowClick(event: any, row: {id: string}): Promise<any> {
-    return this.$router.push({name: 'shopItem', params: {id: row.id}});
+  get cartTotal() {
+    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total,0);
+  }
+
+  getBiggestDiscount(productLines: any[]) {
+    let discountLines = productLines.filter(productLine => productLine.isDiscount);
+    discountLines = discountLines.reverse();
+
+    return discountLines.length ? discountLines[0] : null;
   }
 
   activateNavigation() {
@@ -200,8 +398,16 @@ export default class Shop extends Vue {
     this.navigationActive = false;
   };
 
-  get rowsPerPageOptions () {
-    return this.isGrid ? [ 12, 24, 48 ] : [ 10, 20, 50, 100 ];
+  get rowsPerPageOptions() {
+    return this.isGrid ? [12, 24, 48] : [10, 20, 50, 100];
+  }
+
+  get selectedProduct() {
+    return this.order.selectedProduct;
+  }
+
+  get selectedListing() {
+    return this.order.selectedListing;
   }
 
   protected objectFlip(obj: any) {
@@ -295,6 +501,67 @@ export default class Shop extends Vue {
     }
   }
 
+  openOrderForm(product: any) {
+    // this.order.selectedListing = listing;
+    this.order.selectedProduct = product;
+    this.order.quantity = 1;
+    this.orderFormState = true;
+  }
+
+  processOrderForm() {
+    this.$v.$touch();
+    if (!this.$v.$invalid) {
+
+    } else {
+
+    }
+  }
+
+  validateQuantity(value: number) {
+    const min = 1;
+    const max = Math.floor(this.order.selectedProduct.amount_in_stock / this.order.selectedListing.amount);
+    if (value <= 0) {
+      this.order.quantity = min;
+      this.$q.notify({
+        type: 'warning',
+        message: 'You need to order at least 1',
+      });
+    } else if (value > max) {
+      this.order.quantity = max;
+      this.$q.notify({
+        type: 'warning',
+        message: `You can only order up to ${max} due to stock limits`,
+      });
+    }
+  }
+
+  setSelectedListing(listing: any) {
+    this.order.selectedListing = listing;
+  }
+
+  addToCart() {
+    this.orderFormLoadingState = true;
+    this.$axios.post('shop/addToCart', {order: this.order.selectedListing, quantity: this.order.quantity}).then(
+      response => {
+        this.$q.notify({
+          type: 'positive',
+          message: 'Product added to cart!'
+        });
+
+        this.$store.commit('shop/setCart', response.data);
+      }
+    ).finally(
+      () => {
+        this.orderFormLoadingState = false;
+        this.orderFormState = false;
+      }
+    );
+  }
+
+  showShoppingCart() {
+    this.shoppingCartState = true;
+  }
+
   created() {
     this.loading = true;
     this.$axios.get('shop').then(
@@ -312,6 +579,6 @@ export default class Shop extends Vue {
 
 <style lang="scss">
 .productImage {
-  height:250px
+  height: 250px
 }
 </style>

@@ -1,7 +1,9 @@
 import {store} from 'quasar/wrappers';
 import Vuex from 'vuex';
 import auth from './auth';
+import shop from './shop';
 import {AuthStateInterface} from './auth/state';
+import {ShopStateInterface} from 'src/store/shop/state';
 
 // import example from './module-example';
 // import { ExampleStateInterface } from './module-example/state';
@@ -15,7 +17,8 @@ export interface StateInterface {
   // Define your own store structure, using submodules if needed
   // example: ExampleStateInterface;
   // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
-  auth: AuthStateInterface
+  auth: AuthStateInterface,
+  shop: ShopStateInterface
 }
 
 export default store(function ({ Vue }) {
@@ -23,7 +26,8 @@ export default store(function ({ Vue }) {
 
   return new Vuex.Store<StateInterface>({
     modules: {
-      auth
+      auth,
+      shop
     },
 
     // enable strict mode (adds overhead!)

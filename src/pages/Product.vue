@@ -3,7 +3,11 @@
     <div class="bg-accent rounded-borders">
       <q-card class="product-card q-pt-lg" flat bordered>
         <q-btn @click="$router.push({name: 'products'})" round color="primary" icon="arrow_left" class="q-ml-lg">
-          <q-tooltip>
+          <q-tooltip
+            transition-show="scale"
+            transition-hide="scale"
+            anchor="top middle"
+            self="bottom middle">
             Back to products
           </q-tooltip>
         </q-btn>
