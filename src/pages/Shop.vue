@@ -207,7 +207,7 @@
           <q-card class="q-pb-sm" :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section>
               <q-img contain class="productImage"
-                     :src="props.cols.filter(function(col){return col.name === 'image'})[0].value"/>
+                     :src="props.row.image"/>
             </q-card-section>
             <q-card-section class="text-center">
               <h6>
@@ -226,11 +226,12 @@
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-item-label caption class="text-capitalize">{{
-                      objectFlip(TYPES)[props.cols.filter(function (col) {
-                        return col.name === 'type';
-                      })[0].value]
-                    }}
+                  <q-item-label caption class="text-capitalize">
+                    <q-badge color="secondary">
+                      {{
+                        objectFlip(TYPES)[props.row.type]
+                      }}
+                    </q-badge>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -244,11 +245,12 @@
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-item-label caption>{{
-                      props.cols.filter(function (col) {
-                        return col.name === 'amount_in_stock';
-                      })[0].value
-                    }}
+                  <q-item-label caption>
+                    <q-badge :color="props.row.amount_in_stock ? 'positive' : 'negative'">
+                      {{
+                        props.row.amount_in_stock
+                      }}
+                    </q-badge>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -262,7 +264,12 @@
             </div>
             <q-separator v-if="getBiggestDiscount(props.row.product_listings)"/>
             <q-card-actions align="around">
-              <q-btn @click="openOrderForm(props.row)" flat style="width:100%">Add to cart</q-btn>
+              <q-btn :disabled="!props.row.amount_in_stock || !props.row.product_listings.length"
+                     @click="openOrderForm(props.row)" flat style="width:100%">
+                Add to cart
+              </q-btn>
+              <q-tooltip color="warning" v-if="!props.row.amount_in_stock">Product not in stock</q-tooltip>
+              <q-tooltip color="warning" v-if="!props.row.product_listings.length">No product listings available</q-tooltip>
             </q-card-actions>
           </q-card>
         </div>
@@ -385,7 +392,7 @@ export default class Shop extends Vue {
   };
 
   get cartTotal() {
-    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total,0);
+    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total, 0);
   }
 
   getBiggestDiscount(productLines: any[]) {
