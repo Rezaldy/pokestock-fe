@@ -11,6 +11,10 @@
         v-model="shoppingCartState" persistent
       >
         <q-card style="width: 700px; max-width: 80vw;">
+
+          <q-inner-loading :showing="shoppingCartLoadingState">
+            <q-spinner-gears size="50px" color="primary"/>
+          </q-inner-loading>
           <q-card-section>
             <div class="text-h6">Shopping cart</div>
           </q-card-section>
@@ -38,7 +42,7 @@
                     <q-item-label>Total</q-item-label>
                   </q-item-section>
                   <q-item-section class="col-1">
-                    <q-item-label class="text-bold">${{ cartTotal }}</q-item-label>
+                    <q-item-label class="text-bold text-positive">${{ cartTotal }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -50,7 +54,7 @@
 
           <q-card-actions align="right" class="bg-white text-teal">
             <q-btn flat label="Close" v-close-popup/>
-            <q-btn flat label="Submit order" v-close-popup/>
+            <q-btn flat label="Submit order"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -251,7 +255,7 @@
             </q-list>
             <q-separator/>
             <div v-if="getBiggestDiscount(props.row.product_listings)" class="text-center q-py-md">
-              Get a pack of <span class="text-positive text-bold">{{
+              Get a bundle of <span class="text-positive text-bold">{{
                 getBiggestDiscount(props.row.product_listings).amount
               }}</span> at a discounted price of <span
               class="text-positive text-bold">${{ getBiggestDiscount(props.row.product_listings).price }}</span>!
@@ -347,6 +351,7 @@ export default class Shop extends Vue {
   public orderFormLoadingState = false;
   public orderFormState = false;
   public shoppingCartState = false;
+  public shoppingCartLoadingState = false;
   public order: {
     selectedProduct?: any;
     selectedListing?: any;
@@ -560,6 +565,17 @@ export default class Shop extends Vue {
 
   showShoppingCart() {
     this.shoppingCartState = true;
+    this.shoppingCartLoadingState = true;
+
+    this.$axios.post('shop/cart').then(
+      response => {
+        this.$store.commit('shop/setCart', response.data);
+      }
+    ).finally(
+      () => {
+        this.shoppingCartLoadingState = false;
+      }
+    )
   }
 
   created() {
