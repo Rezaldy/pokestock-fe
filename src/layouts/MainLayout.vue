@@ -110,7 +110,7 @@ const routesData: {
     title: 'Shop',
     caption: 'Buy your items here!',
     icon: 'shopping_cart',
-    route: 'shop',
+    route: 'shopCategories',
     requiresAuth: true,
     hideOnAuth: false,
     requiresAdmin: false,

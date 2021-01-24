@@ -26,7 +26,9 @@ const routes: RouteConfig[] = [
         component: () => import('pages/ProductForm.vue'),
         meta: {requiresAdmin: true}
       },
-      {path: 'shop', name: 'shop', component: () => import('pages/Shop.vue')},
+      {path: 'shop/:category', name: 'shopCategory', component: () => import('pages/Shop.vue'), meta: {requiresAdmin: true}},
+      {path: 'shop/all', name: 'shopAll', component: () => import('pages/Shop.vue'), meta: {requiresAdmin: true}},
+      {path: 'shop', name: 'shopCategories', component: () => import('pages/ShopCategories.vue'), meta: {requiresAdmin: true}},
     ]
   },
 

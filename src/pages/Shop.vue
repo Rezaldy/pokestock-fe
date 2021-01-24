@@ -1,5 +1,14 @@
 <template>
   <q-page class="row items-start justify-start q-pa-xl">
+    <q-btn @click="$router.push({name: 'shopCategories'})" color="primary" icon="arrow_left">
+      <q-tooltip
+        transition-show="scale"
+        transition-hide="scale"
+        anchor="top middle"
+        self="bottom middle">
+        Back to shop categories
+      </q-tooltip>
+    </q-btn>
     <q-toolbar class="bg-primary text-white">
       <q-toolbar-title>
         Shop
@@ -235,7 +244,7 @@
                   </q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item>
+              <q-item v-if="props.row.product_listings.length">
                 <q-item-section>
                   <q-item-label>
                     Starting at
@@ -597,7 +606,8 @@ export default class Shop extends Vue {
   created() {
     this.loading = true;
     const cartPromise = this.$store.dispatch('shop/fetchShoppingCart');
-    const shopPromise = this.$axios.get('shop').then(
+    const params = this.$route.params.category !== undefined ? {type: parseInt(this.$route.params.category)} : {};
+    const shopPromise = this.$axios.get('shop',{params: params}).then(
       response => {
         this.data = response.data as unknown[];
       }
