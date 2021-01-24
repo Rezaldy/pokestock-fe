@@ -86,6 +86,7 @@ export default class ShopCategories extends Vue {
 
   goToShop(category?: number) {
     if (category !== undefined) {
+      // @ts-ignore
       this.$router.push({name: 'shopCategory', params: {category}});
     } else {
       this.$router.push({name: 'shopAll'})
