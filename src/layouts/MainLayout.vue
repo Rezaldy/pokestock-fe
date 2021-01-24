@@ -72,7 +72,6 @@
 
 <script lang="ts">
 import EssentialLink from 'components/EssentialLink.vue';
-import Scrollbar from 'smooth-scrollbar';
 
 const routesData: {
   title: string;
