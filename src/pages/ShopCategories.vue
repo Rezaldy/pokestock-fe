@@ -97,8 +97,8 @@ export default class ShopCategories extends Vue {
 
 <style lang="scss" scoped>
 .image {
-  min-height: 450px;
-  max-height: 450px;
+  min-height: 250px;
+  max-height: 250px;
 }
 
 .categoryCard {

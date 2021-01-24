@@ -21,9 +21,10 @@
           <q-menu touch-position>
             <q-list>
               <q-item clickable class="text-center">
-                <q-item-section @click="toggleDark">{{$q.dark.isActive ? 'Light Mode' : 'Dark Mode'}}</q-item-section>
+                <q-item-section @click="toggleDark">{{ $q.dark.isActive ? 'Light Mode' : 'Dark Mode' }}</q-item-section>
               </q-item>
-              <q-item clickable @click="connectDiscord" v-close-popup v-if="!$store.getters['auth/user'].discord_nickname">
+              <q-item clickable @click="connectDiscord" v-close-popup
+                      v-if="!$store.getters['auth/user'].discord_nickname">
                 <q-item-section>Connect Discord</q-item-section>
               </q-item>
             </q-list>
@@ -70,7 +71,8 @@
 </template>
 
 <script lang="ts">
-import EssentialLink from 'components/EssentialLink.vue'
+import EssentialLink from 'components/EssentialLink.vue';
+import Scrollbar from 'smooth-scrollbar';
 
 const routesData: {
   title: string;
@@ -158,6 +160,7 @@ export default class MainLayout extends Vue {
       }
     );
   }
+
   get externalLinks() {
     return externalLinksData.filter(
       link => {
