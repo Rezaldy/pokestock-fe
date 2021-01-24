@@ -6,12 +6,10 @@
 <script lang="ts">
 import {Vue, Component} from 'vue-property-decorator';
 import Vuelidate from 'vuelidate';
-import ScrollBar from '@morioh/v-smooth-scrollbar';
 
 Vue.use(Vuelidate);
-Vue.use(ScrollBar);
 
-@Component()
+@Component
 export default class App extends Vue {
 
   created() {
