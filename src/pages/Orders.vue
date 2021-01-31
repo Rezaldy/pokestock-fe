@@ -88,7 +88,6 @@
 
 <script lang="ts">
 import {Vue, Component} from 'vue-property-decorator';
-import dayjs from 'dayjs';
 
 @Component({
   components: {}
