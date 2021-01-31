@@ -66,9 +66,52 @@
           </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
-          <q-td colspan="100%">
+          <q-td colspan="100%" class="bg-primary">
             <div>
-
+              <div class="text-h4">Order {{ props.row.id }}</div>
+              <div class="text-h5">Items in order</div>
+              <q-separator/>
+              <table>
+                <thead>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Amount</th>
+                </thead>
+                <tbody>
+                <tr v-for="product in props.row.order_lines">
+                  <td>
+                    <q-img :src="product.product_listing.product.image"/>
+                  </td>
+                  <td>{{ product.product_listing.product.name }}</td>
+                  <td>{{ product.product_listing.amount * product.quantity }}</td>
+                </tr>
+                </tbody>
+              </table>
+              <div>
+                <div class="text-h5">Wants bulk</div>
+                <q-separator/>
+                <span v-if="props.row.includesBulk">
+                  <q-icon name="thumb_up" class="yesNoIcon text-green q-mt-sm"/>
+                </span>
+                <span v-else>
+                  <q-icon name="thumb_down" class="yesNoIcon text-red q-mt-sm"/>
+                </span>
+              </div>
+              <div>
+                <div class="text-h5">Wants codes</div>
+                <q-separator/>
+                <span v-if="props.row.includesCodes">
+                  <q-icon name="thumb_up" class="yesNoIcon text-green q-mt-sm"/>
+                </span>
+                <span v-else>
+                  <q-icon name="thumb_down" class="yesNoIcon text-red q-mt-sm"/>
+                </span>
+              </div>
+              <div>
+                <div class="text-h5">Request for future packs</div>
+                <q-separator/>
+                <div>{{ props.row.futurePackRequest ? props.row.futurePackRequest : 'None' }}</div>
+              </div>
             </div>
           </q-td>
         </q-tr>
@@ -246,5 +289,7 @@ export default class Orders extends Vue {
 </script>
 
 <style lang="scss" scoped>
-
+.yesNoIcon {
+  font-size: 3em;
+}
 </style>

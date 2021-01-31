@@ -124,7 +124,7 @@
               <div class="row q-gutter-xs">
                 <q-btn
                   @click="setSelectedListing(listing)" class="text-center" :key="listing.id"
-                  v-for="listing in order.selectedProduct.product_listings"
+                  v-for="listing in getAvailableListings(order.selectedProduct.product_listings)"
                   :color="listing.isDiscount ? 'positive' : 'secondary'">
                   {{ listing.amount }}x${{ (listing.price / listing.amount).toFixed(2) }}
                   <q-tooltip
@@ -482,6 +482,10 @@ export default class Shop extends Vue {
     return discountLines.length ? discountLines[0] : null;
   }
 
+  getAvailableListings(productListings: { amount: number; }[]) {
+    return productListings && productListings.length ? productListings.filter(productListing => productListing.amount <= this.order.selectedProduct.amount_in_stock) : [];
+  }
+
   activateNavigation() {
     this.navigationActive = true;
   };
@@ -631,6 +635,8 @@ export default class Shop extends Vue {
     this.order.selectedListing = listing;
   }
 
+
+
   addToCart() {
     this.orderFormLoadingState = true;
     this.$axios.post('shop/addToCart', {order: this.order.selectedListing, quantity: this.order.quantity}).then(
@@ -673,7 +679,16 @@ export default class Shop extends Vue {
     this.$v.additionalData.$touch();
     if (!this.$v.additionalData.$invalid) {
       if (this.$store.getters['auth/user'].discord_nickname) {
-        this.$store.dispatch('shop/submitShoppingCart', {additionalData: this.additionalData});
+        this.shoppingCartLoadingState = true;
+        this.$store.dispatch('shop/submitShoppingCart', {additionalData: this.additionalData}).then(
+          response => {
+            this.$router.push({name: 'orders'});
+          }
+        ).finally(
+          () => {
+            this.shoppingCartLoadingState = false;
+          }
+        );
       }
     } else {
       this.$q.notify({
