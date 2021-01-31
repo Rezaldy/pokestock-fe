@@ -14,6 +14,7 @@
     "@types/vuelidate": "^0.7.13",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
     "oauth2-popup-flow": "^1.1.0",
     "quasar": "^1.0.0",

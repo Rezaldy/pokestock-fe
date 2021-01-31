@@ -73,80 +73,90 @@
 <script lang="ts">
 import EssentialLink from 'components/EssentialLink.vue';
 
-const routesData: {
-  title: string;
-  caption: string;
-  icon: string;
-  route: string;
-  requiresAuth: boolean;
-  hideOnAuth: boolean;
-  requiresAdmin?: boolean;
-}[] = [
-  {
-    title: 'Login',
-    caption: 'Log in here',
-    icon: 'login',
-    route: 'login',
-    requiresAuth: false,
-    hideOnAuth: true
-  },
-  {
-    title: 'Dashboard',
-    caption: 'The Pokémon library hub',
-    icon: 'home',
-    route: 'dashboard',
-    requiresAuth: true,
-    hideOnAuth: false
-  },
-  {
-    title: 'Products',
-    caption: 'Manage products here',
-    icon: 'shopping_cart',
-    route: 'products',
-    requiresAuth: true,
-    hideOnAuth: false,
-    requiresAdmin: true,
-  },
-  {
-    title: 'Shop',
-    caption: 'Buy your items here!',
-    icon: 'shopping_cart',
-    route: 'shopCategories',
-    requiresAuth: true,
-    hideOnAuth: false,
-    requiresAdmin: false,
-  },
-];
-
-const externalLinksData: {
-  title: string;
-  caption: string;
-  icon: string;
-  route: string;
-  requiresAuth: boolean;
-  hideOnAuth: boolean;
-  requiresAdmin?: boolean;
-}[] = [
-  {
-    title: 'Stream',
-    caption: 'Click here to go to my stream',
-    icon: 'link',
-    route: 'https://twitch.tv/onceinluv',
-    requiresAuth: true,
-    hideOnAuth: false
-  },
-]
-
 import {Vue, Component} from 'vue-property-decorator';
 
 @Component({
   components: {EssentialLink}
 })
 export default class MainLayout extends Vue {
+  public routesData: {
+    title: string;
+    caption: string;
+    icon: string;
+    route: string;
+    requiresAuth: boolean;
+    hideOnAuth: boolean;
+    requiresAdmin?: boolean;
+  }[] = [
+    {
+      title: 'Login',
+      caption: 'Log in here',
+      icon: 'login',
+      route: 'login',
+      requiresAuth: false,
+      hideOnAuth: true
+    },
+    {
+      title: 'Dashboard',
+      caption: 'The Pokémon library hub',
+      icon: 'home',
+      route: 'dashboard',
+      requiresAuth: true,
+      hideOnAuth: false
+    },
+    {
+      title: 'Products',
+      caption: 'Manage products here',
+      icon: 'shopping_cart',
+      route: 'products',
+      requiresAuth: true,
+      hideOnAuth: false,
+      requiresAdmin: true,
+    },
+    {
+      title: 'Shop',
+      caption: 'Buy your items here!',
+      icon: 'shopping_cart',
+      route: 'shopCategories',
+      requiresAuth: true,
+      hideOnAuth: false,
+      requiresAdmin: false,
+    },
+    {
+      title: 'Orders',
+      caption: this.$store.getters['auth/user'].isAdmin ? 'The list of orders! [ADMIN]' : 'Buy your items here!',
+      icon: 'shopping_cart',
+      route: 'orders',
+      requiresAuth: true,
+      hideOnAuth: false,
+      requiresAdmin: false,
+    },
+  ];
+
+  public externalLinksData: {
+    title: string;
+    caption: string;
+    icon: string;
+    route: string;
+    requiresAuth: boolean;
+    hideOnAuth: boolean;
+    requiresAdmin?: boolean;
+  }[] = [
+    {
+      title: 'Stream',
+      caption: 'Click here to go to my stream',
+      icon: 'link',
+      route: 'https://twitch.tv/onceinluv',
+      requiresAuth: true,
+      hideOnAuth: false
+    },
+  ]
+
+
   leftDrawerOpen = false;
 
   get routes() {
-    return routesData.filter(
+    return this.routesData.filter(
       link => {
         return (link.requiresAuth && this.$store.getters['auth/isAuthorized']) || (link.hideOnAuth && !this.$store.getters['auth/isAuthorized'])
       }
@@ -161,7 +171,7 @@ export default class MainLayout extends Vue {
   }
 
   get externalLinks() {
-    return externalLinksData.filter(
+    return this.externalLinksData.filter(
       link => {
         return (link.requiresAuth && this.$store.getters['auth/isAuthorized']) || (link.hideOnAuth && !this.$store.getters['auth/isAuthorized'])
       }

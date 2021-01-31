@@ -21,7 +21,7 @@
           <div class="text-h5 q-mt-sm q-mb-xs">Amount in stock: {{ amount_in_stock }}</div>
           <div class="text-h6 q-mt-sm q-mb-xs">Withheld stock: {{ hidden_stock }}</div>
           <q-btn @click="showProductInfo" color="primary" icon="edit" label="Edit product" class="q-mr-sm"/>
-          <q-btn @click="confirmRemoveProduct" color="negative" icon="delete" label="Remove product"  class="q-mr-sm"/>
+          <q-btn @click="confirmRemoveProduct" color="negative" icon="delete" label="Remove product" class="q-mr-sm"/>
           <q-dialog v-model="productFormState" persistent transition-show="scale" transition-hide="scale">
             <q-card :class="{ 'bg-dark': $q.dark.isActive, 'bg-primary': !$q.dark.isActive }" class="text-white"
                     style="width: 300px">
@@ -35,10 +35,12 @@
                 <q-input class="q-mt-sm" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                          autogrow stack-label required dense filled v-model="productFormData.description"
                          label="Description"/>
-                <q-input class="q-mt-sm" type="number" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
+                <q-input class="q-mt-sm" type="number"
+                         :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                          stack-label required dense filled v-model="productFormData.amount_in_stock"
                          label="Amount in stock"/>
-                <q-input class="q-mt-sm" type="number" :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
+                <q-input class="q-mt-sm" type="number"
+                         :class="{'bg-accent': !$q.dark.isActive,'rounded-borders': !$q.dark.isActive}"
                          stack-label required dense filled v-model="productFormData.hidden_stock"
                          label="Withheld stock"/>
                 <q-select class="q-mt-sm" filled map-options emit-value
@@ -270,6 +272,108 @@
             </q-card-section>
           </div>
         </q-slide-transition>
+
+        <q-card-actions>
+          <q-btn
+            color="grey"
+            rounded
+            flat
+            label="Product log"
+            :icon="expandedProductLog ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expandedProductLog = !expandedProductLog"
+          />
+        </q-card-actions>
+        <q-slide-transition>
+          <div v-show="expandedProductLog">
+            <q-separator/>
+            <q-card-section class="text-subitle2">
+              <q-table
+                dense
+                :loading="productLogLoading"
+                ref="productListings"
+                :class="tableClass"
+                tabindex="0"
+                title="Product log"
+                :data="productLogData"
+                color="primary"
+                :columns="logColumns"
+                row-key="id"
+                selection="multiple"
+                :selected.sync="selected"
+                :pagination.sync="pagination"
+                :filter="filter"
+                @focusin.native="activateNavigation"
+                @focusout.native="deactivateNavigation"
+                @keydown.native="onKey"
+              >
+                <template v-slot:loading>
+                  <q-inner-loading showing color="primary"/>
+                </template>
+
+                <template v-slot:header="props">
+                  <q-tr :props="props">
+                    <q-th auto-width/>
+                    <q-th
+                      v-for="col in props.cols"
+                      :key="col.name"
+                      :props="props"
+                    >
+                      {{ col.label }}
+                    </q-th>
+                  </q-tr>
+                </template>
+
+                <template v-slot:body="props">
+                  <q-tr :props="props">
+                    <q-td auto-width>
+                      <q-btn size="sm" color="primary" round dense @click="props.expand = !props.expand"
+                             :icon="props.expand ? 'remove' : 'add'"/>
+                    </q-td>
+                    <q-td
+                      v-for="col in props.cols"
+                      :key="col.name"
+                      :props="props"
+                    >
+                      {{ col.value }}
+                    </q-td>
+                  </q-tr>
+                  <q-tr v-show="props.expand" :props="props">
+                    <q-td colspan="100%">
+                      <div class="text-left">
+                        <div class="text-h5">Changes made by {{ props.row.user.twitch_nickname }}</div>
+                        <table>
+                          <thead>
+                            <th>Value changed</th>
+                            <th>Old value</th>
+                            <th>New value</th>
+                          </thead>
+                          <tbody>
+                          <tr v-for="item in getDifferences(props.row.old_values, props.row.new_values)">
+                            <td>{{ item.key }}</td>
+                            <td>{{ item.oldValue }}</td>
+                            <td>{{ item.newValue }}</td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </q-td>
+                  </q-tr>
+                </template>
+
+                <template v-slot:no-data="{ icon, message, filter }">
+                  <div class="full-width row flex-center text-accent q-gutter-sm"
+                       :class="{'text-black': !$q.dark.isActive}">
+                    <q-icon size="2em" name="sentiment_dissatisfied"/>
+                    <span>
+                      Well this is sad... {{ message }}
+                    </span>
+                    <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon"/>
+                  </div>
+                </template>
+              </q-table>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
       </q-card>
     </div>
   </q-page>
@@ -286,8 +390,11 @@ export default class Products extends Vue {
   public listingFormState = false;
   public productFormState = false;
   public imageFormState = false;
+  public productChangeLogState = false;
   public expandedProductListings = true;
+  public expandedProductLog = false;
   public loading = false;
+  public productLogLoading = false;
   public navigationActive = false;
   public dialogLoading = false;
   public filter = '';
@@ -299,6 +406,22 @@ export default class Products extends Vue {
     {name: 'amount', label: 'Amount', field: 'amount', sortable: true, align: 'left'},
     {name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left'},
     {name: 'isDiscount', label: 'Is discount', field: 'isDiscount', sortable: true, align: 'center'},
+  ];
+  public logColumns = [
+    {
+      name: 'user',
+      label: 'Changed by',
+      field: (row: { user: { twitch_nickname: any; }; }) => row.user.twitch_nickname,
+      sortable: true,
+      align: 'left'
+    },
+    {
+      name: 'created_at',
+      label: 'Changed at',
+      field: (row: { created_at: string | number | Date; }) => new Date(row.created_at).toLocaleString(),
+      sortable: true,
+      align: 'left'
+    },
   ];
   public data: {
     id?: number;
@@ -316,6 +439,9 @@ export default class Products extends Vue {
     type: undefined,
     hidden: undefined,
   };
+
+  public productLogData = [];
+
   public productFormData: {
     id?: number;
     amount_in_stock?: number;
@@ -374,15 +500,31 @@ export default class Products extends Vue {
 
   activateNavigation() {
     this.navigationActive = true;
-  };
+  }
 
   deactivateNavigation() {
     this.navigationActive = false;
-  };
+  }
+
+  protected getDifferences(oldObject: { [key: string]: any }, newObject: { [key: string]: any }) {
+    const differences = [];
+
+    for (const [key, value] of Object.entries(oldObject)) {
+      if (value !== newObject[key]) {
+        differences.push({
+          key,
+          oldValue: value,
+          newValue: newObject[key]
+        });
+      }
+    }
+
+    return differences;
+  }
 
   tableClass() {
     return this.navigationActive ? 'shadow-8 no-outline' : void 0
-  };
+  }
 
   onKey(evt: { keyCode: number; preventDefault: () => void; }) {
     if (
@@ -517,7 +659,9 @@ export default class Products extends Vue {
   }
 
   protected fetchProduct() {
-    this.$axios.get(`/products/${this.$route.params.id}`).then(
+    this.loading = true;
+    this.productLogLoading = true
+    const productPromise = this.$axios.get(`/products/${this.$route.params.id}`).then(
       response => {
         this.data = response.data;
         this.data.hidden = !!response.data.hidden;
@@ -536,6 +680,19 @@ export default class Products extends Vue {
         })
       }
     );
+
+    const auditsPromise = this.$axios.get(`/products/${this.$route.params.id}/audits`).then(
+      response => {
+        this.productLogData = response.data;
+      }
+    )
+
+    Promise.all([productPromise, auditsPromise]).then(
+      () => {
+        this.loading = false;
+        this.productLogLoading = false;
+      }
+    )
   }
 
   protected fetchProductListings() {
@@ -620,8 +777,13 @@ export default class Products extends Vue {
     this.productFormData = this.data;
     this.productFormState = true;
   }
+
   protected showImageForm() {
     this.imageFormState = true;
+  }
+
+  protected showProductChangeLog() {
+    this.productChangeLogState = true;
   }
 
   protected confirmRemoveProduct() {
@@ -653,7 +815,7 @@ export default class Products extends Vue {
     formData.append('image', this.imageFile);
 
     const requestConfig = {
-      headers: { 'content-type': 'multipart/form-data' }
+      headers: {'content-type': 'multipart/form-data'}
     }
 
     this.$axios.post(`/products/${this.$route.params.id}/image/upload`, formData, requestConfig).then(
@@ -665,11 +827,11 @@ export default class Products extends Vue {
         this.$q
       }
     )
-    .finally(
-      () => {
-        this.imageFormState = false;
-      }
-    );
+      .finally(
+        () => {
+          this.imageFormState = false;
+        }
+      );
   }
 };
 </script>

@@ -311,16 +311,16 @@ export default class Products extends Vue {
     return [12, 24, 48];
   }
 
+  get tableClass() {
+    return this.navigationActive ? 'shadow-8 no-outline' : void 0
+  };
+
   activateNavigation() {
     this.navigationActive = true;
   };
 
   deactivateNavigation() {
     this.navigationActive = false;
-  };
-
-  tableClass() {
-    return this.navigationActive ? 'shadow-8 no-outline' : void 0
   };
 
   onKey(evt: { keyCode: number; preventDefault: () => void; }) {

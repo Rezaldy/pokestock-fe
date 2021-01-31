@@ -25,36 +25,60 @@
             <q-spinner-gears size="50px" color="primary"/>
           </q-inner-loading>
           <q-card-section>
-            <div class="text-h6">Shopping cart</div>
+            <div class="text-h5">Shopping cart</div>
           </q-card-section>
-
           <q-card-section class="q-pt-none">
             <div>
-              <q-list v-if="Object.keys($store.getters['shop/getCart']).length" bordered separator>
-                <q-item v-ripple v-for="cartItem in $store.getters['shop/getCart']" :key="cartItem.order.id">
-                  <q-item-section>
-                    <q-item-section class="col-1" avatar>
-                      <q-avatar color="primary" rounded text-color="white">
-                        <q-img :src="cartItem.product.image"/>
-                      </q-avatar>
+              <div v-if="Object.keys($store.getters['shop/getCart']).length">
+                <q-list bordered separator>
+                  <q-item v-ripple v-for="cartItem in $store.getters['shop/getCart']" :key="cartItem.order.id">
+                    <q-item-section class="col-1">
+                      <q-item-section avatar>
+                        <q-avatar color="primary" rounded text-color="white">
+                          <q-img :src="cartItem.product.image"/>
+                        </q-avatar>
+                      </q-item-section>
                     </q-item-section>
-                  </q-item-section>
-                  <q-item-section class="col-10">
-                    <q-item-label>{{ cartItem.product.name }}</q-item-label>
-                  </q-item-section>
-                  <q-item-section class="col-1">
-                    <q-item-label class="text-bold">${{ cartItem.order.price }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section class="col-11">
-                    <q-item-label>Total</q-item-label>
-                  </q-item-section>
-                  <q-item-section class="col-1">
-                    <q-item-label class="text-bold text-positive">${{ cartTotal }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
+                    <q-item-section class="col-9 no-margin">
+                      <q-item-label>{{ cartItem.product.name }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-2 text-right">
+                      <q-item-label class="text-bold">${{ cartItem.order.price }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section class="col-10">
+                      <q-item-label>Total</q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-2 text-right">
+                      <q-item-label class="text-bold text-positive">${{ cartTotal }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+                <div class="text-h6 q-mt-lg">
+                  Additional information
+                </div>
+                <q-separator/>
+                <q-toggle v-model="additionalData.includeCodes" checked-icon="check" color="secondary"
+                          unchecked-icon="clear" label="Include codes"/>
+                <q-toggle v-model="additionalData.includeBulk" checked-icon="check" color="secondary"
+                          unchecked-icon="clear" label="Include bulk"/>
+                <q-slide-transition appear>
+                  <q-input v-if="additionalData.includeBulk"
+                           v-model="additionalData.bulkSpecifics"
+                           filled
+                           autogrow
+                           label="What would you like to keep?"
+                  />
+                </q-slide-transition>
+                <q-input
+                  class="q-mt-sm"
+                  v-model="additionalData.futurePackRequests"
+                  filled
+                  autogrow
+                  label="If there are packs you want to buy that we dont have, let us know what they are!"
+                />
+              </div>
               <div v-else>
                 Your shopping cart is empty.
               </div>
@@ -63,7 +87,19 @@
 
           <q-card-actions align="right" class="bg-white text-teal">
             <q-btn flat label="Close" v-close-popup/>
-            <q-btn flat label="Submit order"/>
+            <q-btn @click="clearShoppingCart" flat label="Clear"/>
+            <q-btn @click="submitOrder" flat label="Submit order">
+              <q-tooltip
+                v-if="!$store.getters['auth/user'].discord_nickname"
+                transition-show="scale"
+                transition-hide="scale"
+                anchor="top middle"
+                self="bottom middle"
+                content-class="bg-warning text-black text-bold"
+              >
+                Connect your discord before submitting orders! Click on your name in the top right to do so.
+              </q-tooltip>
+            </q-btn>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -292,7 +328,8 @@
                 Add to cart
               </q-btn>
               <q-tooltip color="warning" v-if="!props.row.amount_in_stock">Product not in stock</q-tooltip>
-              <q-tooltip color="warning" v-if="!props.row.product_listings.length">No product listings available</q-tooltip>
+              <q-tooltip color="warning" v-if="!props.row.product_listings.length">No product listings available
+              </q-tooltip>
             </q-card-actions>
           </q-card>
         </div>
@@ -360,7 +397,7 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {Validations} from 'vuelidate-property-decorators';
-import {required} from 'vuelidate/lib/validators';
+import {required, requiredIf} from 'vuelidate/lib/validators';
 
 @Component({
   components: {}
@@ -370,9 +407,18 @@ export default class Shop extends Vue {
   validations = {
     order: {
       quantity: {required}
+    },
+    additionalData: {
+      includeCodes: {required},
+      includeBulk: {required},
+      bulkSpecifics: {
+        required: requiredIf((bulkSpecificsModel) => {
+          return this.additionalData.includeBulk;
+        })
+      },
+      futurePackRequests: {}
     }
   }
-
 
   public isGrid = true;
   public data: unknown[] = [];
@@ -382,6 +428,17 @@ export default class Shop extends Vue {
   public orderFormState = false;
   public shoppingCartState = false;
   public shoppingCartLoadingState = false;
+  public additionalData: {
+    includeCodes: boolean;
+    includeBulk: boolean;
+    bulkSpecifics?: string;
+    futurePackRequests: string;
+  } = {
+    includeCodes: false,
+    includeBulk: false,
+    bulkSpecifics: undefined,
+    futurePackRequests: ''
+  };
   public order: {
     selectedProduct?: any;
     selectedListing?: any;
@@ -415,7 +472,7 @@ export default class Shop extends Vue {
   };
 
   get cartTotal() {
-    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total, 0);
+    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total, 0).toFixed(2);
   }
 
   getBiggestDiscount(productLines: any[]) {
@@ -603,15 +660,39 @@ export default class Shop extends Vue {
     )
   }
 
+  clearShoppingCart() {
+    this.shoppingCartLoadingState = true;
+    this.$store.dispatch('shop/clearShoppingCart').finally(
+      () => {
+        this.shoppingCartLoadingState = false;
+      }
+    )
+  }
+
+  submitOrder() {
+    this.$v.additionalData.$touch();
+    if (!this.$v.additionalData.$invalid) {
+      if (this.$store.getters['auth/user'].discord_nickname) {
+        this.$store.dispatch('shop/submitShoppingCart', {additionalData: this.additionalData});
+      }
+    } else {
+      this.$q.notify({
+        message: 'Some additional data fields are invalid. Please check them and try again.',
+        type: 'warning'
+      })
+    }
+  }
+
   created() {
     this.loading = true;
     const cartPromise = this.$store.dispatch('shop/fetchShoppingCart');
     const params = this.$route.params.category !== undefined ? {type: parseInt(this.$route.params.category)} : {};
-    const shopPromise = this.$axios.get('shop',{params: params}).then(
+    const shopPromise = this.$axios.get('shop', {params: params}).then(
       response => {
         this.data = response.data as unknown[];
       }
-    )
+    );
+
     Promise.all([cartPromise, shopPromise]).finally(
       () => {
         this.loading = false;

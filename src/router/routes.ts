@@ -12,6 +12,7 @@ const routes: RouteConfig[] = [
         component: () => import('pages/Dashboard.vue'),
         meta: {requiresAdmin: true}
       },
+      // PRODUCT MANAGEMENT
       {path: 'products', name: 'products', component: () => import('pages/Products.vue'), meta: {requiresAdmin: true}},
       {path: 'product/:id', name: 'product', component: () => import('pages/Product.vue'), meta: {requiresAdmin: true}},
       {
@@ -26,9 +27,13 @@ const routes: RouteConfig[] = [
         component: () => import('pages/ProductForm.vue'),
         meta: {requiresAdmin: true}
       },
-      {path: 'shop/:category', name: 'shopCategory', component: () => import('pages/Shop.vue'), meta: {requiresAdmin: true}},
-      {path: 'shop/all', name: 'shopAll', component: () => import('pages/Shop.vue'), meta: {requiresAdmin: true}},
-      {path: 'shop', name: 'shopCategories', component: () => import('pages/ShopCategories.vue'), meta: {requiresAdmin: true}},
+      // SHOP
+      {path: 'shop/:category', name: 'shopCategory', component: () => import('pages/Shop.vue')},
+      {path: 'shop/all', name: 'shopAll', component: () => import('pages/Shop.vue')},
+      {path: 'shop', name: 'shopCategories', component: () => import('pages/ShopCategories.vue')},
+      // ORDERS
+      {path: 'orders', name: 'orders', component: () => import('pages/Orders.vue')},
+      {path: 'order/:id', name: 'order', component: () => import('pages/Order.vue')},
     ]
   },
 
