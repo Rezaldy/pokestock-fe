@@ -135,6 +135,7 @@
               </q-card-section>
             </q-card>
           </q-dialog>
+          b
         </div>
         <div v-else-if="user.isAdmin" class="col col-4">
           <div v-if="!data.isCancelled">
@@ -154,10 +155,10 @@
                 </div>
                 <div class="col">
                   <div v-if="data.isPaid">
-                    <q-icon name="check" />
+                    <q-icon name="check"/>
                   </div>
                   <div v-else>
-                    <q-icon name="cancel" />
+                    <q-icon name="cancel"/>
                   </div>
                 </div>
               </div>
@@ -175,10 +176,10 @@
                 </div>
                 <div class="col">
                   <div v-if="data.paymentConfirmed">
-                    <q-icon name="check" />
+                    <q-icon name="check"/>
                   </div>
                   <div v-else>
-                    <q-icon name="cancel" />
+                    <q-icon name="cancel"/>
                   </div>
                 </div>
               </div>
@@ -191,7 +192,8 @@
               <div>
                 <div v-if="!data.paymentConfirmed" class="row q-gutter-md q-my-xs full-width">
                   <div class="q-ml-sm">
-                    <q-btn @click="declinePayment" class="col" label="Decline payment" color="info" icon="report_problem"/>
+                    <q-btn @click="declinePayment" class="col" label="Decline payment" color="info"
+                           icon="report_problem"/>
                   </div>
                   <div>
                     <q-btn @click="confirmPayment" class="col" label="Confirm payment" color="positive" icon="check"/>
@@ -329,13 +331,13 @@ export default class Order extends Vue {
   }
 
   public declinePayment() {
-    this.$q.loading.show();
     this.$q.dialog({
       title: 'Confirm',
       message: 'Are you sure you would like to decline the customer\'s payment?',
       cancel: true,
       persistent: true
     }).onOk(() => {
+      this.$q.loading.show();
       this.$axios.post(`/orders/${this.$route.params.id}/declinePayment`).then(
         () => {
           this.$q.notify({
@@ -343,18 +345,22 @@ export default class Order extends Vue {
             message: 'Payment declined!'
           });
         }
+      ).finally(
+        () => {
+          this.$q.loading.hide();
+        }
       )
     });
   }
 
   public confirmPayment() {
-    this.$q.loading.show();
     this.$q.dialog({
       title: 'Confirm',
       message: 'Are you sure you would like to confirm the customer\'s payment?',
       cancel: true,
       persistent: true
     }).onOk(() => {
+      this.$q.loading.show();
       this.$axios.post(`/orders/${this.$route.params.id}/confirmPayment`).then(
         () => {
           this.$q.notify({
@@ -362,18 +368,22 @@ export default class Order extends Vue {
             message: 'Payment confirmed!'
           });
         }
+      ).finally(
+        () => {
+          this.$q.loading.hide();
+        }
       )
     });
   }
 
   public cancelOrder() {
-    this.$q.loading.show();
     this.$q.dialog({
       title: 'Confirm',
       message: 'Are you sure you would like to cancel this order?',
       cancel: true,
       persistent: true
     }).onOk(() => {
+      this.$q.loading.show();
       this.$axios.post(`/orders/${this.$route.params.id}/cancel`).then(
         () => {
           this.$q.notify({
@@ -381,24 +391,32 @@ export default class Order extends Vue {
             message: 'Order cancelled!'
           });
         }
+      ).finally(
+        () => {
+          this.$q.loading.hide();
+        }
       )
     });
   }
 
   public completeOrder() {
-    this.$q.loading.show();
     this.$q.dialog({
       title: 'Confirm',
       message: 'Are you sure you would like to complete this order?',
       cancel: true,
       persistent: true
     }).onOk(() => {
+      this.$q.loading.show();
       this.$axios.post(`/orders/${this.$route.params.id}/complete`).then(
         () => {
           this.$q.notify({
             type: 'positive',
             message: 'Order completed!'
           });
+        }
+      ).finally(
+        () => {
+          this.$q.loading.hide();
         }
       )
     });
