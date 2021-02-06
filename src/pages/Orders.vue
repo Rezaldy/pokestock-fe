@@ -112,6 +112,11 @@
                 <q-separator/>
                 <div>{{ props.row.futurePackRequest ? props.row.futurePackRequest : 'None' }}</div>
               </div>
+              <div>
+                <div class="text-h5">Order info</div>
+                <q-separator/>
+                <q-btn @click="$router.push({name:'order', params:{id: props.row.id}})" icon="receipt" label="Go to order" color="secondary" />
+              </div>
             </div>
           </q-td>
         </q-tr>
