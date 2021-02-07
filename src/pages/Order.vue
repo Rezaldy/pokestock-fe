@@ -135,7 +135,6 @@
               </q-card-section>
             </q-card>
           </q-dialog>
-          b
         </div>
         <div v-else-if="user.isAdmin" class="col col-4">
           <div v-if="!data.isCancelled">
@@ -191,12 +190,17 @@
               <q-separator/>
               <div>
                 <div v-if="!data.paymentConfirmed" class="row q-gutter-md q-my-xs full-width">
-                  <div class="q-ml-sm">
+                  <div>
                     <q-btn @click="declinePayment" class="col" label="Decline payment" color="info"
                            icon="report_problem"/>
                   </div>
                   <div>
                     <q-btn @click="confirmPayment" class="col" label="Confirm payment" color="positive" icon="check"/>
+                  </div>
+                </div>
+                <div v-if="!data.paymentConfirmed" class="row q-gutter-md q-my-xs full-width">
+                  <div>
+                    <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
                   </div>
                 </div>
                 <div v-else class="row q-gutter-md q-my-xs full-width">
@@ -348,6 +352,7 @@ export default class Order extends Vue {
       ).finally(
         () => {
           this.$q.loading.hide();
+          this.fetchOrder();
         }
       )
     });
@@ -371,6 +376,7 @@ export default class Order extends Vue {
       ).finally(
         () => {
           this.$q.loading.hide();
+          this.fetchOrder();
         }
       )
     });
@@ -394,6 +400,7 @@ export default class Order extends Vue {
       ).finally(
         () => {
           this.$q.loading.hide();
+          this.fetchOrder();
         }
       )
     });
@@ -417,6 +424,7 @@ export default class Order extends Vue {
       ).finally(
         () => {
           this.$q.loading.hide();
+          this.fetchOrder();
         }
       )
     });
