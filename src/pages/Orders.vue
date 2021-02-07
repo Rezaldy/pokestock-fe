@@ -1,5 +1,15 @@
 <template>
   <q-page padding>
+    <div class="full-width row flex-center q-mb-sm">
+      <q-btn @click="status = ''" v-if="status !== ''" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded push label="Reset filter" />
+      <q-btn-group rounded>
+        <q-btn v-if="status !== 'new'" @click="status = 'new'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'new'" :push="status !== 'new'" label="New" />
+        <q-btn v-if="status !== 'paid'" @click="status = 'paid'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'paid'" :push="status !== 'paid'" label="Paid" />
+        <q-btn v-if="status !== 'paymentConfirmed'" @click="status = 'paymentConfirmed'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'paymentConfirmed'" :push="status !== 'paymentConfirmed'" label="Payment confirmed" />
+        <q-btn v-if="status !== 'completed'" @click="status = 'completed'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'completed'" :push="status !== 'completed'" label="Completed" />
+        <q-btn v-if="status !== 'cancelled'" @click="status = 'cancelled'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'cancelled'" :push="status !== 'cancelled'" label="Cancelled" />
+      </q-btn-group>
+    </div>
     <q-table
       dense
       :loading="loading"
@@ -115,7 +125,7 @@
               <div>
                 <div class="text-h5">Order info</div>
                 <q-separator/>
-                <q-btn @click="$router.push({name:'order', params:{id: props.row.id}})" icon="receipt" label="Go to order" color="secondary" />
+                <q-btn class="q-mt-sm" @click="$router.push({name:'order', params:{id: props.row.id}})" icon="send" label="Go to order" color="secondary" />
               </div>
             </div>
           </q-td>
@@ -135,7 +145,7 @@
 </template>
 
 <script lang="ts">
-import {Vue, Component} from 'vue-property-decorator';
+import {Vue, Component, Watch} from 'vue-property-decorator';
 
 @Component({
   components: {}
@@ -144,6 +154,8 @@ export default class Orders extends Vue {
   loading = false;
   dialogLoading = false;
   navigationActive = false;
+  status: string = '';
+
 
   filter = '';
   selected: any = [];
@@ -173,6 +185,11 @@ export default class Orders extends Vue {
 
   data = [];
 
+  @Watch('status')
+  statusChanged() {
+    this.fetchOrders();
+  }
+
   get rowsPerPageOptions() {
     return [20, 40, 60, 80, 100];
   }
@@ -190,7 +207,6 @@ export default class Orders extends Vue {
   };
 
   protected onRowClick(event: any, row: any) {
-    console.log('hey');
     this.$router.push({name: 'order', params: {id: row.id}});
   }
 
@@ -277,10 +293,23 @@ export default class Orders extends Vue {
     }
   }
 
-  created() {
+  fetchOrders() {
     this.loading = true;
+    const options: {
+      params: {
+        status?: string
+      }
+    } = {
+      params: {
+        status: undefined
+      }
+    };
 
-    this.$axios.get('/orders').then(
+    if (this.status !== '') {
+      options.params.status = this.status;
+    }
+
+    this.$axios.get('/orders', options).then(
       response => {
         this.data = response.data;
       }
@@ -289,6 +318,10 @@ export default class Orders extends Vue {
         this.loading = false;
       }
     )
+  }
+
+  created() {
+    this.fetchOrders();
   }
 }
 </script>

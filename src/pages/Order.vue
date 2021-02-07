@@ -34,7 +34,7 @@
             <template v-slot:body-cell-isCompleted="props">
               <q-td :props="props" auto-width>
                 <span
-                  v-if="(!user.isAdmin || (user.id === data.customer_id && !data.isPaid)) || data.isCancelled">
+                  v-if="(!user.isAdmin || (user.id === data.customer_id && data.status !== 'paid' )) || data.status === 'cancelled'">
                   {{ props.value ? 'Yes' : 'No' }}
                 </span>
                 <q-toggle
@@ -53,9 +53,9 @@
             </template>
           </q-table>
         </div>
-        <div v-if="!user.isAdmin || (user.id === data.customer_id && !data.isPaid)" class="col col-4">
-          <div v-if="!data.isCancelled">
-            <div v-if="!data.isPaid">
+        <div v-if="!user.isAdmin || (user.id === data.customer_id && data.status === 'new')" class="col col-4">
+          <div v-if="data.status !== 'cancelled'">
+            <div v-if="data.status !== 'paid' && data.status !== 'paymentConfirmed'">
               <div class="row q-mb-md">
                 <q-btn class="col-12 q-py-md" type="a" :href="`https://paypal.me/MLBreaks/${data.totalPrice}USD`"
                        target="_blank"
@@ -137,7 +137,7 @@
           </q-dialog>
         </div>
         <div v-else-if="user.isAdmin" class="col col-4">
-          <div v-if="!data.isCancelled">
+          <div v-if="data.status !== 'cancelled'">
             <div class="full-width">
               <div class="row text-bold">
                 <div class="col">
@@ -150,10 +150,18 @@
               <q-separator/>
               <div class="row">
                 <div class="col">
+                  Status
+                </div>
+                <div class="col">
+                  {{ data.status }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
                   Payment done by customer
                 </div>
                 <div class="col">
-                  <div v-if="data.isPaid">
+                  <div v-if="data.status === 'paid' || data.status === 'paymentConfirmed'">
                     <q-icon name="check"/>
                   </div>
                   <div v-else>
@@ -174,7 +182,7 @@
                   Payment confirmed
                 </div>
                 <div class="col">
-                  <div v-if="data.paymentConfirmed">
+                  <div v-if="data.status === 'paymentConfirmed'">
                     <q-icon name="check"/>
                   </div>
                   <div v-else>
@@ -183,13 +191,13 @@
                 </div>
               </div>
             </div>
-            <div v-if="!data.isCompleted">
+            <div v-if="data.status !== 'completed'">
               <div class="text-h4 q-mt-md">
                 Actions
               </div>
               <q-separator/>
               <div>
-                <div v-if="!data.paymentConfirmed" class="row q-gutter-md q-my-xs full-width">
+                <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
                   <div>
                     <q-btn @click="declinePayment" class="col" label="Decline payment" color="info"
                            icon="report_problem"/>
@@ -198,7 +206,7 @@
                     <q-btn @click="confirmPayment" class="col" label="Confirm payment" color="positive" icon="check"/>
                   </div>
                 </div>
-                <div v-if="!data.paymentConfirmed" class="row q-gutter-md q-my-xs full-width">
+                <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
                   <div>
                     <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
                   </div>
