@@ -34,11 +34,11 @@
             <template v-slot:body-cell-isCompleted="props">
               <q-td :props="props" auto-width>
                 <span
-                  v-if="(!user.isAdmin || (user.id === data.customer_id && data.status !== 'paid' )) || data.status === 'cancelled'">
+                  v-if="!user.isAdmin || (user.id === data.customer_id && ['paid', 'paymentConfirmed'].indexOf(data.status) === -1)">
                   {{ props.value ? 'Yes' : 'No' }}
                 </span>
                 <q-toggle
-                  v-else-if="user.isAdmin"
+                  v-else
                   @input="toggleFulfillment(props.row)"
                   :value="props.value"
                   checked-icon="check"
@@ -216,7 +216,7 @@
                     <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
                   </div>
                   <div>
-                    <q-btn @click="completeOrder" class="col" label="Complete order" color="positive" icon="check"/>
+                    <q-btn v-if="checkIfCompleteable" @click="completeOrder" class="col" label="Complete order" color="positive" icon="check"/>
                   </div>
                 </div>
               </div>
@@ -281,6 +281,15 @@ export default class Order extends Vue {
 
   get user() {
     return this.$store.getters['auth/user'];
+  }
+
+  get checkIfCompleteable() {
+    return this.data.order_lines.filter(
+      // @ts-ignore
+      orderLine => {
+        return !orderLine.isCompleted
+      })
+      .length === 0
   }
 
   public toggleFulfillment(row: { id: any; product_listing: any; order_id: any; }) {

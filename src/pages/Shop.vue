@@ -31,6 +31,17 @@
             <div>
               <div v-if="Object.keys($store.getters['shop/getCart']).length">
                 <q-list bordered separator>
+                  <q-item v-ripple class="text-bold">
+                    <q-item-section class="col-9">
+                      Item
+                    </q-item-section>
+                    <q-item-section class="col-2 no-margin">
+                      Quantity
+                    </q-item-section>
+                    <q-item-section class="col-1 q-ml-lg">
+                      Price
+                    </q-item-section>
+                  </q-item>
                   <q-item v-ripple v-for="cartItem in $store.getters['shop/getCart']" :key="cartItem.order.id">
                     <q-item-section class="col-1">
                       <q-item-section avatar>
@@ -39,8 +50,11 @@
                         </q-avatar>
                       </q-item-section>
                     </q-item-section>
-                    <q-item-section class="col-9 no-margin">
+                    <q-item-section class="col-8 no-margin">
                       <q-item-label>{{ cartItem.product.name }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-1 no-margin">
+                      <q-item-label>{{ cartItem.quantity }}</q-item-label>
                     </q-item-section>
                     <q-item-section class="col-2 text-right">
                       <q-item-label class="text-bold">${{ cartItem.order.price * cartItem.quantity }}</q-item-label>

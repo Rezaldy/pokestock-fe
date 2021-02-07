@@ -1,13 +1,60 @@
 <template>
   <q-page padding>
     <div class="full-width row flex-center q-mb-sm">
-      <q-btn @click="status = ''" v-if="status !== ''" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded push label="Reset filter" />
+      <q-btn
+        @click="status = []"
+        v-if="status.length"
+        :color="$q.dark.isActive ? 'dark' : 'primary'"
+        rounded
+        push
+        label="Reset filter"
+      />
       <q-btn-group rounded>
-        <q-btn v-if="status !== 'new'" @click="status = 'new'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'new'" :push="status !== 'new'" label="New" />
-        <q-btn v-if="status !== 'paid'" @click="status = 'paid'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'paid'" :push="status !== 'paid'" label="Paid" />
-        <q-btn v-if="status !== 'paymentConfirmed'" @click="status = 'paymentConfirmed'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'paymentConfirmed'" :push="status !== 'paymentConfirmed'" label="Payment confirmed" />
-        <q-btn v-if="status !== 'completed'" @click="status = 'completed'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'completed'" :push="status !== 'completed'" label="Completed" />
-        <q-btn v-if="status !== 'cancelled'" @click="status = 'cancelled'" :color="$q.dark.isActive ? 'dark' : 'primary'" rounded :unelevated="status === 'cancelled'" :push="status !== 'cancelled'" label="Cancelled" />
+        <q-btn
+          :class="{insetShadow: status.indexOf('new') > -1}"
+          @click="toggleStatus('new')"
+          :color="$q.dark.isActive ? 'dark' : 'primary'"
+          rounded
+          :unelevated="status.indexOf('new') > -1"
+          :push="status.indexOf('new') === -1"
+          label="New"
+        />
+        <q-btn
+          :class="{insetShadow: status.indexOf('paid') > -1}"
+          @click="toggleStatus('paid')"
+          :color="$q.dark.isActive ? 'dark' : 'primary'"
+          rounded
+          :unelevated="status.indexOf('paid') > -1"
+          :push="status.indexOf('paid') === -1"
+          label="Paid"
+        />
+        <q-btn
+          :class="{insetShadow: status.indexOf('paymentConfirmed') > -1}"
+          @click="toggleStatus('paymentConfirmed')"
+          :color="$q.dark.isActive ? 'dark' : 'primary'"
+          rounded
+          :unelevated="status.indexOf('paymentConfirmed') > -1"
+          :push="status.indexOf('paymentConfirmed') === -1"
+          label="Payment confirmed"
+        />
+        <q-btn
+          :class="{insetShadow: status.indexOf('completed') > -1}"
+          @click="toggleStatus('completed')"
+          :color="$q.dark.isActive ? 'dark' : 'primary'"
+          rounded
+          :unelevated="status.indexOf('completed') > -1"
+          :push="status.indexOf('completed') === -1"
+          label="Completed"
+        />
+        <q-btn
+          :class="{insetShadow: status.indexOf('cancelled') > -1}"
+          @click="toggleStatus('cancelled')"
+          :color="$q.dark.isActive ? 'dark' : 'primary'"
+          rounded
+          :unelevated="status.indexOf('cancelled') > -1"
+          :push="status.indexOf('cancelled') === -1"
+          label="Cancelled"
+        />
       </q-btn-group>
     </div>
     <q-table
@@ -125,7 +172,8 @@
               <div>
                 <div class="text-h5">Order info</div>
                 <q-separator/>
-                <q-btn class="q-mt-sm" @click="$router.push({name:'order', params:{id: props.row.id}})" icon="send" label="Go to order" color="secondary" />
+                <q-btn class="q-mt-sm" @click="$router.push({name:'order', params:{id: props.row.id}})" icon="send"
+                       label="Go to order" color="secondary"/>
               </div>
             </div>
           </q-td>
@@ -154,7 +202,7 @@ export default class Orders extends Vue {
   loading = false;
   dialogLoading = false;
   navigationActive = false;
-  status: string = '';
+  status: string[] = [];
 
 
   filter = '';
@@ -293,20 +341,24 @@ export default class Orders extends Vue {
     }
   }
 
+  toggleStatus(status: string) {
+    if(this.status.indexOf(status as never) === -1) {
+      this.status.push(status);
+    } else {
+      this.status.splice(this.status.indexOf(status as never), 1);
+    }
+  }
+
   fetchOrders() {
     this.loading = true;
-    const options: {
+    const options = {
       params: {
-        status?: string
-      }
-    } = {
-      params: {
-        status: undefined
+        status: []
       }
     };
 
-    if (this.status !== '') {
-      options.params.status = this.status;
+    if (this.status.length) {
+      options.params.status = this.status as never[];
     }
 
     this.$axios.get('/orders', options).then(
@@ -329,5 +381,11 @@ export default class Orders extends Vue {
 <style lang="scss" scoped>
 .yesNoIcon {
   font-size: 3em;
+}
+
+.insetShadow {
+  -webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.6);
+  -moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.6);
+  box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.6);
 }
 </style>
