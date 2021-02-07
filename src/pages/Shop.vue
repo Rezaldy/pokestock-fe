@@ -43,7 +43,7 @@
                       <q-item-label>{{ cartItem.product.name }}</q-item-label>
                     </q-item-section>
                     <q-item-section class="col-2 text-right">
-                      <q-item-label class="text-bold">${{ cartItem.order.price }}</q-item-label>
+                      <q-item-label class="text-bold">${{ cartItem.order.price * cartItem.quantity }}</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item>
@@ -472,7 +472,7 @@ export default class Shop extends Vue {
   };
 
   get cartTotal() {
-    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => obj.order.price + total, 0).toFixed(2);
+    return Object.values(this.$store.getters['shop/getCart']).reduce((total: number, obj: any) => (obj.order.price * obj.quantity) + total, 0).toFixed(2);
   }
 
   getBiggestDiscount(productLines: any[]) {
