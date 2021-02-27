@@ -18,7 +18,11 @@
           :unelevated="status.indexOf('new') > -1"
           :push="status.indexOf('new') === -1"
           label="New"
-        />
+        >
+          <q-badge color="positive" floating transparent v-if="status.indexOf('new') > -1">
+            ✓
+          </q-badge>
+        </q-btn>
         <q-btn
           :class="{insetShadow: status.indexOf('paid') > -1}"
           @click="toggleStatus('paid')"
@@ -27,7 +31,11 @@
           :unelevated="status.indexOf('paid') > -1"
           :push="status.indexOf('paid') === -1"
           label="Paid"
-        />
+        >
+          <q-badge color="positive" floating transparent v-if="status.indexOf('paid') > -1">
+            ✓
+          </q-badge>
+        </q-btn>
         <q-btn
           :class="{insetShadow: status.indexOf('paymentConfirmed') > -1}"
           @click="toggleStatus('paymentConfirmed')"
@@ -36,7 +44,11 @@
           :unelevated="status.indexOf('paymentConfirmed') > -1"
           :push="status.indexOf('paymentConfirmed') === -1"
           label="Payment confirmed"
-        />
+        >
+          <q-badge color="positive" floating transparent v-if="status.indexOf('paymentConfirmed') > -1">
+            ✓
+          </q-badge>
+        </q-btn>
         <q-btn
           :class="{insetShadow: status.indexOf('completed') > -1}"
           @click="toggleStatus('completed')"
@@ -45,7 +57,11 @@
           :unelevated="status.indexOf('completed') > -1"
           :push="status.indexOf('completed') === -1"
           label="Completed"
-        />
+        >
+          <q-badge color="positive" floating transparent v-if="status.indexOf('completed') > -1">
+            ✓
+          </q-badge>
+        </q-btn>
         <q-btn
           :class="{insetShadow: status.indexOf('cancelled') > -1}"
           @click="toggleStatus('cancelled')"
@@ -54,7 +70,11 @@
           :unelevated="status.indexOf('cancelled') > -1"
           :push="status.indexOf('cancelled') === -1"
           label="Cancelled"
-        />
+        >
+          <q-badge color="positive" floating transparent v-if="status.indexOf('cancelled') > -1">
+            ✓
+          </q-badge>
+        </q-btn>
       </q-btn-group>
     </div>
     <q-table

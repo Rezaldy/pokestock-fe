@@ -66,8 +66,9 @@
                          label="Payment reference"/>
                 <q-btn class="col-1" color="secondary" icon="info" @click="tutorialDialog = true"/>
               </div>
-              <div class="row">
-                <q-btn @click="submitPaymentReference" class="col-12" label="Submit" color="primary" icon="send"/>
+              <div class="row q-col-gutter">
+                <q-btn @click="submitPaymentReference" class="col" label="Submit" color="primary" icon="send"/>
+                <q-btn @click="cancelOrder" class="col" label="Cancel" color="negative" icon="cancel"/>
               </div>
             </div>
             <div v-else>
