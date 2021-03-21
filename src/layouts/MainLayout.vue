@@ -1,73 +1,75 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <img class="bg" src="~assets/img/bg.jpg"/>
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
-        />
-        <q-toolbar-title>
-          OnceInLuv Pokémon Store
-        </q-toolbar-title>
-        <div class="row cursor-pointer justify-right items-center" v-if="$store.getters['auth/isAuthorized']">
-          <span class="streamlink q-toolbar__title">{{ $store.getters['auth/user'].twitch_nickname }}</span>
-          <q-img class="rounded-borders" transition="jump-down" style="width: 40px" :ratio="1"
-                 :src="$store.getters['auth/user'].avatar"/>
-          <q-menu touch-position>
-            <q-list>
-              <q-item clickable class="text-center">
-                <q-item-section @click="toggleDark">{{ $q.dark.isActive ? 'Light Mode' : 'Dark Mode' }}</q-item-section>
-              </q-item>
-              <q-item clickable @click="connectDiscord" v-close-popup
-                      v-if="!$store.getters['auth/user'].discord_nickname">
-                <q-item-section>Connect Discord</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </div>
-      </q-toolbar>
-    </q-header>
-    <q-drawer
-      v-model="leftDrawerOpen"
-      bordered
-    >
-      <q-list>
+  <q-scroll-area style="height: 100vh;">
+    <q-layout view="lHh Lpr lFf">
+      <img class="bg" src="~assets/img/bg.jpg"/>
+      <q-header elevated>
+        <q-toolbar>
+          <q-btn
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="leftDrawerOpen = !leftDrawerOpen"
+          />
+          <q-toolbar-title>
+            OnceInLuv Pokémon Store
+          </q-toolbar-title>
+          <div class="row cursor-pointer justify-right items-center" v-if="$store.getters['auth/isAuthorized']">
+            <span class="streamlink q-toolbar__title">{{ $store.getters['auth/user'].twitch_nickname }}</span>
+            <q-img class="rounded-borders" transition="jump-down" style="width: 40px" :ratio="1"
+                   :src="$store.getters['auth/user'].avatar"/>
+            <q-menu touch-position>
+              <q-list>
+                <q-item clickable class="text-center">
+                  <q-item-section @click="toggleDark">{{ $q.dark.isActive ? 'Light Mode' : 'Dark Mode' }}</q-item-section>
+                </q-item>
+                <q-item clickable @click="connectDiscord" v-close-popup
+                        v-if="!$store.getters['auth/user'].discord_nickname">
+                  <q-item-section>Connect Discord</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </div>
+        </q-toolbar>
+      </q-header>
+      <q-drawer
+        v-model="leftDrawerOpen"
+        bordered
+      >
+        <q-list>
+          <q-item-label header>
+            Main Menu
+          </q-item-label>
+          <EssentialLink
+            v-for="route in routes"
+            :key="route.title"
+            v-bind="route"
+          />
+        </q-list>
         <q-item-label header>
-          Main Menu
+          External Links
         </q-item-label>
         <EssentialLink
-          v-for="route in routes"
-          :key="route.title"
-          v-bind="route"
+          v-for="link in externalLinks"
+          :key="link.title"
+          :is-external="true"
+          v-bind="link"
         />
-      </q-list>
-      <q-item-label header>
-        External Links
-      </q-item-label>
-      <EssentialLink
-        v-for="link in externalLinks"
-        :key="link.title"
-        :is-external="true"
-        v-bind="link"
-      />
-    </q-drawer>
+      </q-drawer>
 
-    <q-page-container>
-      <transition
-        mode="out-in"
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-        appear
-      >
-        <router-view/>
-      </transition>
-    </q-page-container>
-  </q-layout>
+      <q-page-container>
+        <transition
+          mode="out-in"
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+          appear
+        >
+          <router-view/>
+        </transition>
+      </q-page-container>
+    </q-layout>
+  </q-scroll-area>
 </template>
 
 <script lang="ts">
@@ -127,6 +129,15 @@ export default class MainLayout extends Vue {
       caption: this.$store.getters['auth/user'].isAdmin ? 'The list of orders! [ADMIN]' : 'Buy your items here!',
       icon: 'shopping_cart',
       route: 'orders',
+      requiresAuth: true,
+      hideOnAuth: false,
+      requiresAdmin: false,
+    },
+    {
+      title: 'Terms and Conditions',
+      caption: 'Read this before buying',
+      icon: 'toc',
+      route: 'termsandconditions',
       requiresAuth: true,
       hideOnAuth: false,
       requiresAdmin: false,

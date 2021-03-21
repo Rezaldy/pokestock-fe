@@ -275,25 +275,6 @@
             </q-card-section>
             <q-separator/>
             <q-list dense>
-              <q-item>
-                <q-item-section>
-                  <q-item-label>{{
-                      props.cols.filter(function (col) {
-                        return col.name === 'type';
-                      })[0].label
-                    }}
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-item-label caption class="text-capitalize">
-                    <q-badge color="secondary">
-                      {{
-                        objectFlip(TYPES)[props.row.type]
-                      }}
-                    </q-badge>
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
               <q-item v-if="props.row.product_listings.length">
                 <q-item-section>
                   <q-item-label>
@@ -330,9 +311,9 @@
             </q-list>
             <q-separator/>
             <div v-if="getBiggestDiscount(props.row.product_listings)" class="text-center q-py-md">
-              Get a bundle of <span class="text-positive text-bold">{{
+              Get <span class="text-positive text-bold">{{
                 getBiggestDiscount(props.row.product_listings).amount
-              }}</span> at a discounted price of <span
+              }}</span> for <span
               class="text-positive text-bold">${{ getBiggestDiscount(props.row.product_listings).price }}</span>!
             </div>
             <q-separator v-if="getBiggestDiscount(props.row.product_listings)"/>
@@ -352,13 +333,6 @@
         <q-td :props="props">
           <div v-if="props.value">
             <q-icon name="check_circle" class="text-primary" style="font-size: 3em;"/>
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-type="props">
-        <q-td :props="props">
-          <div class="text-capitalize">
-            {{ objectFlip(TYPES)[props.value] }}
           </div>
         </q-td>
       </template>
@@ -405,6 +379,11 @@
       </template>
     </q-table>
     <!-- Table end -->
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-fab color="purple" icon="keyboard_arrow_up" direction="up">
+        <q-fab-action color="primary" @click="showShoppingCart" icon="shopping_cart"/>
+      </q-fab>
+    </q-page-sticky>
   </q-page>
 </template>
 
@@ -412,6 +391,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {Validations} from 'vuelidate-property-decorators';
 import {required, requiredIf} from 'vuelidate/lib/validators';
+import {scroll} from 'quasar';
 
 @Component({
   components: {}
@@ -472,9 +452,8 @@ export default class Shop extends Vue {
   columns = [
     {name: 'image', label: 'Image', field: 'image', align: 'left'},
     {name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left'},
-    {name: 'type', label: 'Type', field: 'type', align: 'left'},
     {name: 'price', label: 'Price', field: 'price_listings', sortable: true, align: 'left'},
-    {name: 'amount_in_stock', label: 'Amount in stock', field: 'amount_in_stock', sortable: true, align: 'left'},
+    {name: 'amount_in_stock', label: 'Stock', field: 'amount_in_stock', sortable: true, align: 'left'},
   ];
 
   TYPES = {
@@ -498,6 +477,18 @@ export default class Shop extends Vue {
 
   getAvailableListings(productListings: { amount: number; }[]) {
     return productListings && productListings.length ? productListings.filter(productListing => productListing.amount <= this.order.selectedProduct.amount_in_stock) : [];
+  }
+
+  scrollToTop() {
+    const {getScrollTarget, getScrollPosition, setScrollPosition} = scroll;
+    let element: HTMLElement | null = document.getElementById('shopToolbar');
+    if (element !== null) {
+      console.log(getScrollPosition(element));
+      const offset = element.offsetTop - element.scrollHeight;
+      const duration = 1000;
+      setScrollPosition(element, offset, duration);
+    }
+    // @ts-ignore
   }
 
   activateNavigation() {
@@ -648,7 +639,6 @@ export default class Shop extends Vue {
   setSelectedListing(listing: any) {
     this.order.selectedListing = listing;
   }
-
 
 
   addToCart() {

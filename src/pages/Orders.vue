@@ -78,7 +78,6 @@
       </q-btn-group>
     </div>
     <q-table
-      dense
       :loading="loading"
       ref="orders"
       :class="tableClass"
@@ -235,19 +234,22 @@ export default class Orders extends Vue {
       name: 'customer',
       label: 'Customer',
       field: (row: { customer: { twitch_nickname: any; }; }) => row.customer.twitch_nickname,
-      align: 'left'
+      align: 'left',
+      sortable: true,
     },
     {
       name: 'totalPrice',
       label: 'Total price',
       field: (row: { totalPrice: any; }) => `$${row.totalPrice}`,
-      align: 'left'
+      align: 'left',
+      sortable: true,
     },
     {
       name: 'created_at',
       label: 'Created at',
       field: (row: { created_at: string | number | Date; }) => new Date(row.created_at).toLocaleString(),
-      align: 'left'
+      align: 'left',
+      sortable: true,
     },
   ];
 

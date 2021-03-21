@@ -10,7 +10,13 @@ const routes: RouteConfig[] = [
         path: 'dashboard',
         name: 'dashboard',
         component: () => import('pages/Dashboard.vue'),
-        meta: {requiresAdmin: true}
+        meta: {requiresAdmin: false}
+      },
+      {
+        path: 'termsandconditions',
+        name: 'termsandconditions',
+        component: () => import('pages/TermsAndConditions.vue'),
+        meta: {requiresAdmin: false}
       },
       // PRODUCT MANAGEMENT
       {path: 'products', name: 'products', component: () => import('pages/Products.vue'), meta: {requiresAdmin: true}},
