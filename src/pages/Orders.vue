@@ -17,7 +17,7 @@
           rounded
           :unelevated="status.indexOf('new') > -1"
           :push="status.indexOf('new') === -1"
-          label="New"
+          label="Unpaid"
         >
           <q-badge color="positive" floating transparent v-if="status.indexOf('new') > -1">
             ✓
@@ -227,6 +227,13 @@ export default class Orders extends Vue {
   filter = '';
   selected: any = [];
   pagination: any = {};
+  statusTranslations: any = {
+    'new': 'No payment received',
+    'paid': 'Payment received',
+    'paymentConfirmed': 'Payment confirmed',
+    'completed': 'Completed',
+    'cancelled': 'Cancelled',
+  };
 
   columns = [
     {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -251,7 +258,14 @@ export default class Orders extends Vue {
       align: 'left',
       sortable: true,
     },
-    {name: 'status', label: 'Status', field: 'status', align: 'left', sortable: true},
+    {
+      name: 'status',
+      label: 'Status',
+      field: 'status',
+      align: 'left',
+      sortable: true,
+      format: (val: string) => this.statusTranslations[val],
+    },
   ];
 
   data = [];

@@ -4,19 +4,14 @@
       <div class="text-h2">Order #{{ $route.params.id }}</div>
       <q-separator/>
       <div class="row q-col-gutter-md q-mt-sm">
-        <div class="col col-8">
+        <div class="col">
           <div class="text-h4 full-width">
             Order lines
           </div>
         </div>
-        <div class="col col-4">
-          <div class="text-h4 full-width">
-            Payment
-          </div>
-        </div>
       </div>
       <div class="row q-col-gutter-md">
-        <div class="col col-8">
+        <div class="col">
           <q-table
             :loading="loading"
             dense
@@ -52,181 +47,188 @@
               <q-inner-loading showing color="accent"/>
             </template>
           </q-table>
-        </div>
-        <div v-if="!user.isAdmin || (user.id === data.customer_id && data.status === 'new')" class="col col-4">
-          <div v-if="data.status !== 'cancelled'">
-            <div v-if="data.status !== 'paid' && data.status !== 'paymentConfirmed'">
-              <div class="row q-mb-md">
-                <q-btn class="col-12 q-py-md" type="a" :href="`https://paypal.me/MLBreaks/${data.totalPrice}USD`"
-                       target="_blank"
-                       :label="`Click here to pay for your order ($${data.totalPrice})`" color="purple"/>
-              </div>
-              <div class="row">
-                <q-input class="col-11" clearable filled color="primary" v-model="data.paymentReference"
-                         label="Payment reference"/>
-                <q-btn class="col-1" color="secondary" icon="info" @click="tutorialDialog = true"/>
-              </div>
-              <div class="row q-col-gutter">
-                <q-btn @click="submitPaymentReference" class="col" label="Submit" color="primary" icon="send"/>
-                <q-btn @click="cancelOrder" class="col" label="Cancel" color="negative" icon="cancel"/>
+          <div>
+            <div class="col col-4">
+              <div class="text-h4 full-width">
+                Payment
               </div>
             </div>
-            <div v-else>
-              <div class="text-h3">
-                Order is paid!
-                <q-icon name="today" class="text-orange" style="font-size: 2em;"/>
+            <div v-if="!user.isAdmin || (user.id === data.customer_id && data.status === 'new')" class="col col-4">
+              <div v-if="data.status !== 'cancelled'">
+                <div v-if="data.status !== 'paid' && data.status !== 'paymentConfirmed'">
+                  <div class="row q-mb-md">
+                    <q-btn class="col-12 q-py-md" type="a" :href="`https://paypal.me/MLBreaks/${data.totalPrice}USD`"
+                           target="_blank"
+                           :label="`Click here to pay for your order ($${data.totalPrice})`" color="purple"/>
+                  </div>
+                  <div class="row">
+                    <q-input class="col-11" clearable filled color="primary" v-model="data.paymentReference"
+                             label="Payment reference"/>
+                    <q-btn class="col-1" color="secondary" icon="info" @click="tutorialDialog = true"/>
+                  </div>
+                  <div class="row q-col-gutter">
+                    <q-btn @click="submitPaymentReference" class="col" label="Submit" color="primary" icon="send"/>
+                    <q-btn @click="cancelOrder" class="col" label="Cancel" color="negative" icon="cancel"/>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="text-h3">
+                    Order is paid!
+                    <q-icon name="today" class="text-orange" style="font-size: 2em;"/>
+                  </div>
+                </div>
               </div>
+              <div v-else>
+                <p>
+                  This order has been cancelled. Please contact an administrator or submit a new order.
+                </p>
+              </div>
+              <q-dialog
+                v-model="tutorialDialog"
+                persistent
+                :maximized="maximizedToggle"
+                transition-show="slide-up"
+                transition-hide="slide-down"
+              >
+                <q-card class="bg-primary text-white">
+                  <q-bar>
+                    <q-space/>
+
+                    <q-btn dense flat icon="minimize" @click="maximizedToggle = false" :disable="!maximizedToggle">
+                      <q-tooltip v-if="maximizedToggle" content-class="bg-white text-primary">Minimize</q-tooltip>
+                    </q-btn>
+                    <q-btn dense flat icon="crop_square" @click="maximizedToggle = true" :disable="maximizedToggle">
+                      <q-tooltip v-if="!maximizedToggle" content-class="bg-white text-primary">Maximize</q-tooltip>
+                    </q-btn>
+                    <q-btn dense flat icon="close" v-close-popup>
+                      <q-tooltip content-class="bg-white text-primary">Close</q-tooltip>
+                    </q-btn>
+                  </q-bar>
+
+                  <q-card-section>
+                    <div class="text-h6">How to find your payment reference</div>
+                  </q-card-section>
+
+                  <q-card-section class="q-pt-none">
+                    <ul>
+                      <li>
+                        <div>
+                          <div>
+                            Go to your recent Paypal transactions:
+                          </div>
+                          <q-btn type="a" icon="payment" href="https://www.paypal.com/myaccount/transactions/"
+                                 target="_blank" label="Recent transactions" color="secondary"/>
+                        </div>
+                      </li>
+                      <li>
+                        Click the payment you fulfilled for your order
+                      </li>
+                      <li>
+                        Find the "Transaction ID" of this order
+                      </li>
+                      <li>
+                        Copy this value and paste it in the Payment Reference field of your order
+                      </li>
+                      <li>
+                        Tyler can now immediately verify your order
+                      </li>
+                    </ul>
+                  </q-card-section>
+                </q-card>
+              </q-dialog>
             </div>
-          </div>
-          <div v-else>
-            <p>
-              This order has been cancelled. Please contact an administrator or submit a new order.
-            </p>
-          </div>
-          <q-dialog
-            v-model="tutorialDialog"
-            persistent
-            :maximized="maximizedToggle"
-            transition-show="slide-up"
-            transition-hide="slide-down"
-          >
-            <q-card class="bg-primary text-white">
-              <q-bar>
-                <q-space/>
-
-                <q-btn dense flat icon="minimize" @click="maximizedToggle = false" :disable="!maximizedToggle">
-                  <q-tooltip v-if="maximizedToggle" content-class="bg-white text-primary">Minimize</q-tooltip>
-                </q-btn>
-                <q-btn dense flat icon="crop_square" @click="maximizedToggle = true" :disable="maximizedToggle">
-                  <q-tooltip v-if="!maximizedToggle" content-class="bg-white text-primary">Maximize</q-tooltip>
-                </q-btn>
-                <q-btn dense flat icon="close" v-close-popup>
-                  <q-tooltip content-class="bg-white text-primary">Close</q-tooltip>
-                </q-btn>
-              </q-bar>
-
-              <q-card-section>
-                <div class="text-h6">How to find your payment reference</div>
-              </q-card-section>
-
-              <q-card-section class="q-pt-none">
-                <ul>
-                  <li>
-                    <div>
-                      <div>
-                        Go to your recent Paypal transactions:
-                      </div>
-                      <q-btn type="a" icon="payment" href="https://www.paypal.com/myaccount/transactions/"
-                             target="_blank" label="Recent transactions" color="secondary"/>
+            <div v-else-if="user.isAdmin" class="col col-4">
+              <div v-if="data.status !== 'cancelled'">
+                <div class="full-width">
+                  <div class="row text-bold">
+                    <div class="col">
+                      Field
                     </div>
-                  </li>
-                  <li>
-                    Click the payment you fulfilled for your order
-                  </li>
-                  <li>
-                    Find the "Transaction ID" of this order
-                  </li>
-                  <li>
-                    Copy this value and paste it in the Payment Reference field of your order
-                  </li>
-                  <li>
-                    Tyler can now immediately verify your order
-                  </li>
-                </ul>
-              </q-card-section>
-            </q-card>
-          </q-dialog>
-        </div>
-        <div v-else-if="user.isAdmin" class="col col-4">
-          <div v-if="data.status !== 'cancelled'">
-            <div class="full-width">
-              <div class="row text-bold">
-                <div class="col">
-                  Field
-                </div>
-                <div class="col">
-                  Value
-                </div>
-              </div>
-              <q-separator/>
-              <div class="row">
-                <div class="col">
-                  Status
-                </div>
-                <div class="col">
-                  {{ data.status }}
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  Payment done by customer
-                </div>
-                <div class="col">
-                  <div v-if="data.status === 'paid' || data.status === 'paymentConfirmed'">
-                    <q-icon name="check"/>
+                    <div class="col">
+                      Value
+                    </div>
                   </div>
-                  <div v-else>
-                    <q-icon name="cancel"/>
+                  <q-separator/>
+                  <div class="row">
+                    <div class="col">
+                      Status
+                    </div>
+                    <div class="col">
+                      {{ data.status }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      Payment done by customer
+                    </div>
+                    <div class="col">
+                      <div v-if="data.status === 'paid' || data.status === 'paymentConfirmed'">
+                        <q-icon name="check"/>
+                      </div>
+                      <div v-else>
+                        <q-icon name="cancel"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      Payment reference
+                    </div>
+                    <div class="col">
+                      {{ data.paymentReference ? data.paymentReference : 'N/A' }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      Payment confirmed
+                    </div>
+                    <div class="col">
+                      <div v-if="data.status === 'paymentConfirmed'">
+                        <q-icon name="check"/>
+                      </div>
+                      <div v-else>
+                        <q-icon name="cancel"/>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  Payment reference
-                </div>
-                <div class="col">
-                  {{ data.paymentReference ? data.paymentReference : 'N/A' }}
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  Payment confirmed
-                </div>
-                <div class="col">
-                  <div v-if="data.status === 'paymentConfirmed'">
-                    <q-icon name="check"/>
+                <div v-if="data.status !== 'completed'">
+                  <div class="text-h4 q-mt-md">
+                    Actions
                   </div>
-                  <div v-else>
-                    <q-icon name="cancel"/>
+                  <q-separator/>
+                  <div>
+                    <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
+                      <div>
+                        <q-btn @click="declinePayment" class="col" label="Decline payment" color="info"
+                               icon="report_problem"/>
+                      </div>
+                      <div>
+                        <q-btn @click="confirmPayment" class="col" label="Confirm payment" color="positive" icon="check"/>
+                      </div>
+                    </div>
+                    <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
+                      <div>
+                        <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
+                      </div>
+                    </div>
+                    <div v-else class="row q-gutter-md q-my-xs full-width">
+                      <div class="q-ml-sm">
+                        <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
+                      </div>
+                      <div>
+                        <q-btn v-if="checkIfCompleteable" @click="completeOrder" class="col" label="Complete order" color="positive" icon="check"/>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+              <div v-else>
+                <p>
+                  This order has been cancelled. Please contact an administrator or submit a new order.
+                </p>
               </div>
             </div>
-            <div v-if="data.status !== 'completed'">
-              <div class="text-h4 q-mt-md">
-                Actions
-              </div>
-              <q-separator/>
-              <div>
-                <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
-                  <div>
-                    <q-btn @click="declinePayment" class="col" label="Decline payment" color="info"
-                           icon="report_problem"/>
-                  </div>
-                  <div>
-                    <q-btn @click="confirmPayment" class="col" label="Confirm payment" color="positive" icon="check"/>
-                  </div>
-                </div>
-                <div v-if="data.status !== 'paymentConfirmed'" class="row q-gutter-md q-my-xs full-width">
-                  <div>
-                    <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
-                  </div>
-                </div>
-                <div v-else class="row q-gutter-md q-my-xs full-width">
-                  <div class="q-ml-sm">
-                    <q-btn @click="cancelOrder" class="col" label="Cancel order" color="negative" icon="cancel"/>
-                  </div>
-                  <div>
-                    <q-btn v-if="checkIfCompleteable" @click="completeOrder" class="col" label="Complete order" color="positive" icon="check"/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else>
-            <p>
-              This order has been cancelled. Please contact an administrator or submit a new order.
-            </p>
           </div>
         </div>
       </div>
