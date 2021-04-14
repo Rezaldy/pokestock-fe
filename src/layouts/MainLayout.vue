@@ -47,15 +47,17 @@
             v-bind="route"
           />
         </q-list>
-        <q-item-label header>
-          External Links
-        </q-item-label>
-        <EssentialLink
-          v-for="link in externalLinks"
-          :key="link.title"
-          :is-external="true"
-          v-bind="link"
-        />
+        <q-list>
+          <q-item-label header>
+            External Links
+          </q-item-label>
+          <EssentialLink
+            v-for="link in externalLinks"
+            :key="link.title"
+            :is-external="true"
+            v-bind="link"
+          />
+        </q-list>
       </q-drawer>
 
       <q-page-container>
