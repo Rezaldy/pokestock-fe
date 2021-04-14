@@ -62,9 +62,9 @@
                            :label="`Click here to pay for your order ($${data.totalPrice})`" color="purple"/>
                   </div>
                   <div class="row">
-                    <h6 class="col-xs-12 col-sm-12 col-md-4 q-my-md">
+                    <h6 class="col-xs-12 col-sm-12 col-md-12 q-my-md q-ml-xs text-center">
                       After paying, the tab will not close automatically. Close the tab, and enter your Transaction ID or full name here so
-                      Tyler can immediately verify your order.
+                      Tyler can verify your order. Don't forget to click submit!
                     </h6>
                   </div>
                   <div class="row">
