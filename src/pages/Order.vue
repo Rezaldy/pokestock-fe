@@ -62,9 +62,15 @@
                            :label="`Click here to pay for your order ($${data.totalPrice})`" color="purple"/>
                   </div>
                   <div class="row">
-                    <q-input class="col-11" clearable filled color="primary" v-model="data.paymentReference"
-                             label="Payment reference"/>
-                    <q-btn class="col-1" color="secondary" icon="info" @click="tutorialDialog = true"/>
+                    <h6 class="col-xs-12 col-sm-12 col-md-4 q-my-md">
+                      After paying, the tab will not close automatically. Close the tab, and enter your Transaction ID or full name here so
+                      Tyler can immediately verify your order.
+                    </h6>
+                  </div>
+                  <div class="row">
+                    <q-btn class="col-12" color="secondary" label="How do I find my transaction ID?" icon="info" @click="tutorialDialog = true"/>
+                    <q-input class="col-12" clearable filled color="primary" v-model="data.paymentReference"
+                             label="Enter your payment reference"/>
                   </div>
                   <div class="row q-col-gutter">
                     <q-btn @click="submitPaymentReference" class="col" label="Submit" color="primary" icon="send"/>
