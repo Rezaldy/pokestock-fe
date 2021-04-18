@@ -298,6 +298,7 @@ export default class Products extends Vue {
     boosterbox: 3,
     miscbox: 4,
     groupbreak: 5,
+    jpboosterbox: 6,
     shipping: 99,
   };
 
@@ -308,6 +309,7 @@ export default class Products extends Vue {
     {label: 'Boosterbox', value: 3},
     {label: 'Miscbox', value: 4},
     {label: 'Group Break', value: 5},
+    {label: 'Japanese Booster Box', value: 6},
     {label: 'Shipping', value: 99},
   ];
 
