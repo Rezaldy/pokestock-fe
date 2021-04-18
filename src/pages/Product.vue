@@ -496,6 +496,7 @@ export default class Products extends Vue {
     {label: 'Tin', value: 2},
     {label: 'Boosterbox', value: 3},
     {label: 'Miscbox', value: 4},
+    {label: 'Shipping', value: 5},
   ];
 
   activateNavigation() {

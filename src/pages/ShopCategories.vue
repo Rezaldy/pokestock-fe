@@ -62,6 +62,20 @@
       </div>
 
       <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+        <q-card class="categoryCard" @click="goToShop(5)">
+          <q-card-section class="text-center">
+            <q-icon>
+
+            </q-icon>
+          </q-card-section>
+          <q-separator/>
+          <q-card-section class="flex flex-center">
+            <div class="text-h4">Shipping</div>
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
         <q-card class="categoryCard" @click="goToShop()">
           <q-card-section class="text-center">
             <q-img class="image" src="~assets/img/shop/category/etbplus1.png" contain/>
