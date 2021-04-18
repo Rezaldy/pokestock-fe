@@ -297,7 +297,8 @@ export default class Products extends Vue {
     tin: 2,
     boosterbox: 3,
     miscbox: 4,
-    shipping: 5,
+    groupbreak: 5,
+    shipping: 99,
   };
 
   typesArray = [
@@ -306,7 +307,8 @@ export default class Products extends Vue {
     {label: 'Tin', value: 2},
     {label: 'Boosterbox', value: 3},
     {label: 'Miscbox', value: 4},
-    {label: 'Shipping', value: 5},
+    {label: 'Group Break', value: 5},
+    {label: 'Shipping', value: 99},
   ];
 
   get rowsPerPageOptions() {

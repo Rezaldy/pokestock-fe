@@ -488,6 +488,8 @@ export default class Products extends Vue {
     tin: 2,
     'Booster box': 3,
     'Misc box': 4,
+    'Group Break': 5,
+    'Shipping': 99,
   };
 
   typesArray = [
@@ -496,7 +498,8 @@ export default class Products extends Vue {
     {label: 'Tin', value: 2},
     {label: 'Boosterbox', value: 3},
     {label: 'Miscbox', value: 4},
-    {label: 'Shipping', value: 5},
+    {label: 'Group Break', value: 5},
+    {label: 'Shipping', value: 99},
   ];
 
   activateNavigation() {
