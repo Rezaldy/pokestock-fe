@@ -443,6 +443,7 @@ export default class Products extends Vue {
     this.$axios.get('/products').then(
       response => {
         this.data = response.data as never[];
+        this.selected = [];
       }
     ).catch(
       error => {
