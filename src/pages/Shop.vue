@@ -269,7 +269,7 @@
                      :src="props.row.image"/>
             </q-card-section>
             <q-card-section class="text-center">
-              <h6>
+              <h6 class="q-my-sm">
                 {{ props.row.name }}
               </h6>
             </q-card-section>
@@ -283,7 +283,7 @@
                 </q-item-section>
                 <q-item-section side>
                   <q-item-label caption>
-                    <q-badge color="secondary">
+                    <q-badge color="secondary" style="line-height:20px; font-size:1.5em">
                       {{ props.row.product_listings[0].amount }} for ${{ props.row.product_listings[0].price }}
                     </q-badge>
                   </q-item-label>
@@ -300,7 +300,7 @@
                 </q-item-section>
                 <q-item-section side>
                   <q-item-label caption>
-                    <q-badge :color="props.row.amount_in_stock ? 'positive' : 'negative'">
+                    <q-badge color="positive" style="line-height:20px; font-size:1.5em">
                       {{
                         props.row.amount_in_stock
                       }}
