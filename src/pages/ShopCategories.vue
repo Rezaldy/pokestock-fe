@@ -64,9 +64,19 @@
       <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
         <q-card class="categoryCard" @click="goToShop(5)">
           <q-card-section class="text-center">
-            <q-icon>
+            <q-icon name="groups" style="font-size:17em"/>
+          </q-card-section>
+          <q-separator/>
+          <q-card-section class="flex flex-center">
+            <div class="text-h4">Group Break</div>
+          </q-card-section>
+        </q-card>
+      </div>
 
-            </q-icon>
+      <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+        <q-card class="categoryCard" @click="goToShop(99)">
+          <q-card-section class="text-center">
+            <q-icon name="local_shipping" style="font-size:17em"/>
           </q-card-section>
           <q-separator/>
           <q-card-section class="flex flex-center">
@@ -111,8 +121,8 @@ export default class ShopCategories extends Vue {
 
 <style lang="scss" scoped>
 .image {
-  min-height: 250px;
-  max-height: 250px;
+  min-height: 240px;
+  max-height: 240px;
 }
 
 .categoryCard {
