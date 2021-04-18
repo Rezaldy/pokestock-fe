@@ -127,8 +127,8 @@ export default class MainLayout extends Vue {
       requiresAdmin: false,
     },
     {
-      title: 'Orders',
-      caption: this.$store.getters['auth/user'].isAdmin ? 'The list of orders! [ADMIN]' : 'Buy your items here!',
+      title: this.$store.getters['auth/user'].isAdmin ? 'Orders' : 'Checkout',
+      caption: this.$store.getters['auth/user'].isAdmin ? 'The list of orders! [ADMIN]' : 'Pay for your Order here!',
       icon: 'shopping_cart',
       route: 'orders',
       requiresAuth: true,
