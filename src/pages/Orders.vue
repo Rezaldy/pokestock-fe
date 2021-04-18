@@ -276,7 +276,7 @@ export default class Orders extends Vue {
   }
 
   get rowsPerPageOptions() {
-    return [20, 40, 60, 80, 100];
+    return [50, 100, 200, 1000];
   }
 
   get tableClass() {

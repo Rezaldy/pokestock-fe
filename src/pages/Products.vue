@@ -314,7 +314,7 @@ export default class Products extends Vue {
   ];
 
   get rowsPerPageOptions() {
-    return [12, 24, 48];
+    return [50, 100, 200, 1000];
   }
 
   get tableClass() {
